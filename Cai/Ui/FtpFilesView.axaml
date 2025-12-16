@@ -3,12 +3,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="clr-namespace:Cai.Ui"
-             xmlns:ip="https://github.com/MahApps/IconPacks.Avalonia"
+             xmlns:ic="https://github.com/MahApps/IconPacks.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Cai.Ui.FilesView"
-             x:DataType="ui:FilesViewModel">
+             x:Class="Cai.Ui.FtpFilesView"
+             x:DataType="ui:FtpFilesViewModel">
     <Grid RowDefinitions="Auto,*">
-        <TextBlock Text="{Binding Directory.FullName}" />
+        <TextBlock Text="{Binding Directory.Item.FullName}" />
 
         <ScrollViewer Grid.Row="1" Classes="vertical-scroll">
             <ListBox ItemsSource="{Binding Files}">
@@ -19,14 +19,14 @@
                                 <BehaviorCollection>
                                     <EventTriggerBehavior EventName="DoubleTapped">
                                         <InvokeCommandAction
-                                            Command="{Binding $parent[ui:FilesView].ViewModel.OpenFileCommand}"
+                                            Command="{Binding $parent[ui:FtpFilesView].ViewModel.OpenFileCommand}"
                                             CommandParameter="{Binding}" />
                                     </EventTriggerBehavior>
                                 </BehaviorCollection>
                             </Interaction.Behaviors>
 
                             <StackPanel Classes="horizontal">
-                                <ip:PackIconMaterialDesign Kind="{Binding Icon}" />
+                                <ic:PackIconMaterialDesign Kind="{Binding Icon}" />
                                 <TextBlock Text="{Binding Name}" />
                             </StackPanel>
                         </Border>

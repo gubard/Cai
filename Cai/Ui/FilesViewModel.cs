@@ -18,13 +18,7 @@ public partial class FilesViewModel : ViewModelBase
     {
         _directory = directory;
         _files = [];
-
-        if (directory.Parent != null)
-        {
-            _files.Add(new("..", PackIconMaterialDesignKind.Undo, directory.Parent));
-        }
-
-        _files.AddRange(directory.GetFileSystemInfos().Select(x => new File(x)));
+        Update();
     }
 
     public IEnumerable<File> Files => _files;
@@ -34,7 +28,7 @@ public partial class FilesViewModel : ViewModelBase
     {
         WrapCommand(() =>
         {
-            switch (file.FileInfo)
+            switch (file.Item)
             {
                 case DirectoryInfo directoryInfo:
                 {
@@ -54,18 +48,24 @@ public partial class FilesViewModel : ViewModelBase
         {
             case nameof(Directory):
             {
-                _files.Clear();
-
-                if (Directory.Parent != null)
-                {
-                    _files.Add(new("..", PackIconMaterialDesignKind.Undo, Directory.Parent));
-                }
-
-                _files.AddRange(Directory.GetDirectories().Select(x => new File(x)));
-                _files.AddRange(Directory.GetFiles().Select(x => new File(x)));
-
+                Update();
                 break;
             }
         }
+    }
+
+    private void Update()
+    {
+        _files.Clear();
+
+        if (Directory.Parent != null)
+        {
+            _files.Add(new("..", PackIconMaterialDesignKind.Undo, Directory.Parent));
+        }
+
+        var directories = Directory.GetDirectories().OrderBy(x => x.Name).Select(x => new File(x));
+
+        _files.AddRange(directories);
+        _files.AddRange(Directory.GetFiles().OrderBy(x => x.Name).Select(x => new File(x)));
     }
 }

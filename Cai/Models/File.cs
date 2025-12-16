@@ -1,27 +1,53 @@
-﻿using IconPacks.Avalonia.MaterialDesign;
+﻿using FluentFTP;
+using IconPacks.Avalonia.MaterialDesign;
 
 namespace Cai.Models;
 
 public class File
 {
-    public File(string name, PackIconMaterialDesignKind icon, FileSystemInfo fileInfo)
+    public File(string name, PackIconMaterialDesignKind icon, FileSystemInfo item)
     {
         Name = name;
-        FileInfo = fileInfo;
+        Item = item;
         Icon = icon;
     }
 
-    public File(FileSystemInfo fileInfo)
+    public File(FileSystemInfo item)
     {
-        Name = fileInfo.Name;
-        FileInfo = fileInfo;
+        Name = item.Name;
+        Item = item;
 
-        Icon = FileInfo.Attributes.HasFlag(FileAttributes.Directory)
+        Icon = Item.Attributes.HasFlag(FileAttributes.Directory)
             ? PackIconMaterialDesignKind.Folder
             : PackIconMaterialDesignKind.InsertDriveFile;
     }
 
     public string Name { get; }
-    public FileSystemInfo FileInfo { get; }
+    public FileSystemInfo Item { get; }
+    public PackIconMaterialDesignKind Icon { get; }
+}
+
+public class FtpFile
+{
+    public FtpFile(string name, PackIconMaterialDesignKind icon, FtpListItem item)
+    {
+        Name = name;
+        Item = item;
+        Icon = icon;
+    }
+
+    public FtpFile(FtpListItem item)
+    {
+        Name = item.Name;
+        Item = item;
+
+        Icon = Icon =
+            item.Type == FtpObjectType.Directory
+                ? PackIconMaterialDesignKind.Folder
+                : PackIconMaterialDesignKind.InsertDriveFile;
+    }
+
+    public string Name { get; }
+    public FtpListItem Item { get; }
     public PackIconMaterialDesignKind Icon { get; }
 }

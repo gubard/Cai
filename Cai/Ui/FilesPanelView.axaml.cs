@@ -8,4 +8,7 @@ public partial class FilesPanelView : UserControl
     {
         InitializeComponent();
     }
+
+    public FilesPanelViewModel ViewModel =>
+        DataContext as FilesPanelViewModel ?? throw new InvalidOperationException();
 }
