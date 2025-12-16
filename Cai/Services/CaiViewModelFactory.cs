@@ -1,14 +1,16 @@
-﻿using Cai.Ui;
+﻿using System.Windows.Input;
+using Cai.Ui;
 using FluentFTP;
 using Gaia.Services;
+using Inanna.Models;
 using Inanna.Services;
 
 namespace Cai.Services;
 
 public interface ICaiViewModelFactory
-    : IFactory<DirectoryInfo, FilesViewModel>,
+    : IFactory<(DirectoryInfo directory, ICommand copyCommand), FilesViewModel>,
         IFactory<FtpParametersViewModel>,
-        IFactory<FtpClient, FtpFilesViewModel>,
+        IFactory<(FtpClient ftpClient, ICommand copyCommand), FtpFilesViewModel>,
         IFactory<FilesPanelHeaderViewModel>
 {
     FtpParametersViewModel CreateFtpParameters();
@@ -35,9 +37,9 @@ public class CaiViewModelFactory : ICaiViewModelFactory
         _uiFilesService = uiFilesService;
     }
 
-    public FilesViewModel Create(DirectoryInfo directory)
+    public FilesViewModel Create((DirectoryInfo directory, ICommand copyCommand) input)
     {
-        return new(directory);
+        return new(input.directory, input.copyCommand);
     }
 
     FtpParametersViewModel IFactory<FtpParametersViewModel>.Create()
@@ -45,9 +47,9 @@ public class CaiViewModelFactory : ICaiViewModelFactory
         return CreateFtpParameters();
     }
 
-    public FtpFilesViewModel Create(FtpClient input)
+    public FtpFilesViewModel Create((FtpClient ftpClient, ICommand copyCommand) input)
     {
-        return new(input);
+        return new(input.ftpClient, input.copyCommand);
     }
 
     FilesPanelHeaderViewModel IFactory<FilesPanelHeaderViewModel>.Create()

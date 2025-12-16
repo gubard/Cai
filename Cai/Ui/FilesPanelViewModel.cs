@@ -1,4 +1,5 @@
-﻿using Cai.Models;
+﻿using Avalonia.Collections;
+using Cai.Models;
 using Cai.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -6,6 +7,7 @@ using FluentFTP;
 using Gaia.Services;
 using Inanna.Models;
 using Inanna.Services;
+using File = Cai.Models.File;
 
 namespace Cai.Ui;
 
@@ -15,10 +17,10 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
     private readonly IUiFilesService _uiFilesService;
 
     [ObservableProperty]
-    private object _firstFiles;
+    private IFilesView _firstFiles;
 
     [ObservableProperty]
-    private object _secondFiles;
+    private IFilesView _secondFiles;
 
     public FilesPanelViewModel(
         ICaiViewModelFactory factory,
@@ -30,8 +32,12 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
         _factory = factory;
         _uiFilesService = uiFilesService;
         Roots = filesCache.Roots;
-        _firstFiles = factory.Create(storageService.GetDbDirectory());
-        _secondFiles = factory.Create(storageService.GetDbDirectory());
+        _firstFiles = factory.Create(
+            (storageService.GetDbDirectory(), CopyFromFirstToSecondCommand)
+        );
+        _secondFiles = factory.Create(
+            (storageService.GetDbDirectory(), CopyFromSecondToFirstCommand)
+        );
         Header = _factory.CreateFilesPanelHeader();
     }
 
@@ -49,15 +55,19 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
     {
         WrapCommand(() =>
         {
-            (FirstFiles as IDisposable)?.Dispose();
+            FirstFiles.Dispose();
 
             FirstFiles = file switch
             {
-                DriveRootDirectory drive => _factory.Create(new DirectoryInfo(drive.Drive.Name)),
-                FtpRootDirectory ftp => _factory.Create(
-                    new FtpClient(ftp.Host, ftp.Login, ftp.Password)
+                DriveRootDirectory drive => _factory.Create(
+                    (new DirectoryInfo(drive.Drive.Name), CopyFromFirstToSecondCommand)
                 ),
-                LocalRootDirectory local => _factory.Create(local.Directory),
+                FtpRootDirectory ftp => _factory.Create(
+                    (new FtpClient(ftp.Host, ftp.Login, ftp.Password), CopyFromFirstToSecondCommand)
+                ),
+                LocalRootDirectory local => _factory.Create(
+                    (local.Directory, CopyFromFirstToSecondCommand)
+                ),
                 _ => throw new ArgumentOutOfRangeException(nameof(file)),
             };
         });
@@ -68,17 +78,37 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
     {
         WrapCommand(() =>
         {
-            (SecondFiles as IDisposable)?.Dispose();
+            SecondFiles.Dispose();
 
             SecondFiles = file switch
             {
-                DriveRootDirectory drive => _factory.Create(new DirectoryInfo(drive.Drive.Name)),
-                FtpRootDirectory ftp => _factory.Create(
-                    new FtpClient(ftp.Host, ftp.Login, ftp.Password)
+                DriveRootDirectory drive => _factory.Create(
+                    (new DirectoryInfo(drive.Drive.Name), CopyFromSecondToFirstCommand)
                 ),
-                LocalRootDirectory local => _factory.Create(local.Directory),
+                FtpRootDirectory ftp => _factory.Create(
+                    (new FtpClient(ftp.Host, ftp.Login, ftp.Password), CopyFromSecondToFirstCommand)
+                ),
+                LocalRootDirectory local => _factory.Create(
+                    (local.Directory, CopyFromSecondToFirstCommand)
+                ),
                 _ => throw new ArgumentOutOfRangeException(nameof(file)),
             };
         });
+    }
+
+    [RelayCommand]
+    private async Task CopyFromFirstToSecondAsync(IEnumerable<File> files, CancellationToken ct)
+    {
+        await WrapCommand(() =>
+            SecondFiles.SaveFilesAsync(files.SelectMany(x => x.GetFileData()), ct)
+        );
+    }
+
+    [RelayCommand]
+    private async Task CopyFromSecondToFirstAsync(IEnumerable<File> files, CancellationToken ct)
+    {
+        await WrapCommand(() =>
+            FirstFiles.SaveFilesAsync(files.SelectMany(x => x.GetFileData()), ct)
+        );
     }
 }
