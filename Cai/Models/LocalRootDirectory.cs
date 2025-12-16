@@ -3,50 +3,53 @@ using IconPacks.Avalonia.MaterialDesign;
 
 namespace Cai.Models;
 
-public class DriveRootDirectory
+public abstract class RootDirectory
 {
-    public DriveRootDirectory(string name, DriveInfo drive)
+    protected RootDirectory(string name, PackIconMaterialDesignKind icon)
     {
         Name = name;
+        Icon = icon;
+    }
+
+    public string Name { get; }
+    public PackIconMaterialDesignKind Icon { get; }
+}
+
+public class DriveRootDirectory : RootDirectory
+{
+    public DriveRootDirectory(DriveInfo drive)
+        : base(drive.Name, PackIconMaterialDesignKind.Folder)
+    {
         Drive = drive;
-        Icon = PackIconMaterialDesignKind.Folder;
     }
 
-    public string Name { get; }
     public DriveInfo Drive { get; }
-    public PackIconMaterialDesignKind Icon { get; }
 }
 
-public class RootDirectory
+public class LocalRootDirectory : RootDirectory
 {
-    public RootDirectory(string name, DirectoryInfo directory)
+    public LocalRootDirectory(DirectoryInfo directory)
+        : base(directory.Name, PackIconMaterialDesignKind.Folder)
     {
-        Name = name;
         Directory = directory;
-        Icon = PackIconMaterialDesignKind.Folder;
     }
 
-    public string Name { get; }
     public DirectoryInfo Directory { get; }
-    public PackIconMaterialDesignKind Icon { get; }
 }
 
-public class FtpRootDirectory
+public class FtpRootDirectory : RootDirectory
 {
     public FtpRootDirectory(string name, string host, string login, string password)
+        : base(name, PackIconMaterialDesignKind.Cloud)
     {
-        Name = name;
         Host = host;
         Login = login;
         Password = password;
-        Icon = PackIconMaterialDesignKind.Cloud;
     }
 
-    public string Name { get; }
     public string Host { get; }
     public string Login { get; }
     public string Password { get; }
-    public PackIconMaterialDesignKind Icon { get; }
 
     public FtpClient CreateFtpClient()
     {

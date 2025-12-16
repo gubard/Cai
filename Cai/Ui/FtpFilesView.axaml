@@ -8,7 +8,10 @@
              x:Class="Cai.Ui.FtpFilesView"
              x:DataType="ui:FtpFilesViewModel">
     <Grid RowDefinitions="Auto,*">
-        <TextBlock Text="{Binding Directory.Item.FullName}" />
+        <StackPanel>
+            <TextBlock Text="ftp:/" />
+            <TextBlock Text="{Binding Directory.Item.FullName}" />
+        </StackPanel>
 
         <ScrollViewer Grid.Row="1" Classes="vertical-scroll">
             <ListBox ItemsSource="{Binding Files}" SelectionMode="Multiple">

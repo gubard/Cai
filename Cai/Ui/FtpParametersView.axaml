@@ -4,16 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="clr-namespace:Cai.Ui"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Cai.Ui.CreateFtpView"
-             x:DataType="ui:CreateFtpViewModel">
+             x:Class="Cai.Ui.FtpParametersView"
+             x:DataType="ui:FtpParametersViewModel">
     <StackPanel>
         <TextBlock Classes="field" Text="{DynamicResource Lang.Name}" />
-        <TextBox Text="{Binding Name}" />
+        <TextBox x:Name="TextBoxName" Text="{Binding Name}" KeyDown="TextBoxNameOnKeyDown"/>
         <TextBlock Classes="field" Text="{DynamicResource Lang.Host}" />
-        <TextBox Text="{Binding Host}" />
+        <TextBox x:Name="TextBoxHost" Text="{Binding Host}" KeyDown="TextBoxHostOnKeyDown" />
         <TextBlock Classes="field" Text="{DynamicResource Lang.Login}" />
-        <TextBox Text="{Binding Login}" />
+        <TextBox x:Name="TextBoxLogin" Text="{Binding Login}" KeyDown="TextBoxLoginOnKeyDown" />
         <TextBlock Classes="field" Text="{DynamicResource Lang.Password}" />
-        <TextBox Text="{Binding Password}" />
+        <TextBox x:Name="TextBoxPassword" Classes="password" Text="{Binding Password}" />
     </StackPanel>
 </UserControl>

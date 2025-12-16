@@ -1,0 +1,14 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ip="https://github.com/MahApps/IconPacks.Avalonia"
+             xmlns:ui="clr-namespace:Cai.Ui"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Cai.Ui.FilesPanelHeaderView"
+             x:DataType="ui:FilesPanelHeaderViewModel">
+    <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Classes="align-left-canter h2" Text="{DynamicResource Lang.Files}" />
+        <DropDownButton Grid.Column="1" Content="{ip:MaterialDesign Add}" Command="{Binding ShowCreateFtpCommand}" />
+    </Grid>
+</UserControl>

@@ -70,9 +70,21 @@ public partial class FtpFilesViewModel : ViewModelBase, IDisposable
     {
         _files.Clear();
 
-        if (Directory.Item.LinkObject != null)
+        var lastIndex = Directory.Item.FullName.LastIndexOf('\\');
+
+        if (lastIndex == -1)
         {
-            _files.Add(new("..", PackIconMaterialDesignKind.Undo, Directory.Item.LinkObject));
+            lastIndex = Directory.Item.FullName.LastIndexOf('/');
+        }
+
+        if (lastIndex != -1)
+        {
+            var item = _ftpClient.GetObjectInfo(Directory.Item.FullName.Substring(0, lastIndex));
+
+            if (item is not null)
+            {
+                _files.Add(new("..", PackIconMaterialDesignKind.Undo, item));
+            }
         }
 
         var items = _ftpClient.GetListing(Directory.Item.FullName);

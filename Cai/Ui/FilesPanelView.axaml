@@ -5,107 +5,37 @@
              xmlns:ui="clr-namespace:Cai.Ui"
              xmlns:ip="https://github.com/MahApps/IconPacks.Avalonia"
              xmlns:m="clr-namespace:Cai.Models"
-             xmlns:s="clr-namespace:Inanna.Services;assembly=Inanna"
-             xmlns:im="clr-namespace:Inanna.Models;assembly=Inanna"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Cai.Ui.FilesPanelView"
              x:DataType="ui:FilesPanelViewModel">
     <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,*">
         <ItemsControl Classes="horizontal-wrap" ItemsSource="{Binding Roots}">
             <ItemsControl.ItemTemplate>
-                <s:SelectorDataTemplate>
-                    <DataTemplate DataType="m:DriveRootDirectory">
-                        <Button
-                            Command="{Binding $parent[ui:FilesPanelView].ViewModel.OpenFirstDriveRootDirectoryCommand}"
-                            CommandParameter="{Binding}">
-                            <StackPanel Classes="horizontal">
-                                <ip:PackIconMaterialDesign Kind="{Binding Icon}" />
-                                <TextBlock Text="{Binding Name}" />
-                            </StackPanel>
-                        </Button>
-                    </DataTemplate>
-
-                    <DataTemplate DataType="m:RootDirectory">
-                        <Button Command="{Binding $parent[ui:FilesPanelView].ViewModel.OpenFirstRootDirectoryCommand}"
-                                CommandParameter="{Binding}">
-                            <StackPanel Classes="horizontal">
-                                <ip:PackIconMaterialDesign Kind="{Binding Icon}" />
-                                <TextBlock Text="{Binding Name}" />
-                            </StackPanel>
-                        </Button>
-                    </DataTemplate>
-
-                    <DataTemplate DataType="m:FtpRootDirectory">
-                        <Button
-                            Command="{Binding $parent[ui:FilesPanelView].ViewModel.OpenFirstFtpRootDirectoryCommand}"
-                            CommandParameter="{Binding}">
-                            <StackPanel Classes="horizontal">
-                                <ip:PackIconMaterialDesign Kind="{Binding Icon}" />
-                                <TextBlock Text="{Binding Name}" />
-                            </StackPanel>
-                        </Button>
-                    </DataTemplate>
-
-                    <DataTemplate DataType="im:AddMark">
-                        <DropDownButton Content="{ip:MaterialDesign Add}">
-                            <DropDownButton.Flyout>
-                                <MenuFlyout>
-                                    <MenuItem Header="FTP"
-                                              Command="{Binding $parent[ui:FilesPanelView].ViewModel.ShowCreateFtpCommand}" />
-                                </MenuFlyout>
-                            </DropDownButton.Flyout>
-                        </DropDownButton>
-                    </DataTemplate>
-                </s:SelectorDataTemplate>
+                <DataTemplate DataType="m:RootDirectory">
+                    <Button
+                        Command="{Binding $parent[ui:FilesPanelView].ViewModel.OpenFirstRootDirectoryCommand}"
+                        CommandParameter="{Binding}">
+                        <StackPanel Classes="horizontal">
+                            <ip:PackIconMaterialDesign Kind="{Binding Icon}" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </Button>
+                </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
         <ItemsControl Grid.Column="1" Classes="horizontal-wrap" ItemsSource="{Binding Roots}">
             <ItemsControl.ItemTemplate>
-                <s:SelectorDataTemplate>
-                    <DataTemplate DataType="m:DriveRootDirectory">
-                        <Button
-                            Command="{Binding $parent[ui:FilesPanelView].ViewModel.OpenSecondDriveRootDirectoryCommand}"
-                            CommandParameter="{Binding}">
-                            <StackPanel Classes="horizontal">
-                                <ip:PackIconMaterialDesign Kind="{Binding Icon}" />
-                                <TextBlock Text="{Binding Name}" />
-                            </StackPanel>
-                        </Button>
-                    </DataTemplate>
-
-                    <DataTemplate DataType="m:RootDirectory">
-                        <Button Command="{Binding $parent[ui:FilesPanelView].ViewModel.OpenSecondRootDirectoryCommand}"
-                                CommandParameter="{Binding}">
-                            <StackPanel Classes="horizontal">
-                                <ip:PackIconMaterialDesign Kind="{Binding Icon}" />
-                                <TextBlock Text="{Binding Name}" />
-                            </StackPanel>
-                        </Button>
-                    </DataTemplate>
-
-                    <DataTemplate DataType="m:FtpRootDirectory">
-                        <Button
-                            Command="{Binding $parent[ui:FilesPanelView].ViewModel.OpenSecondFtpRootDirectoryCommand}"
-                            CommandParameter="{Binding}">
-                            <StackPanel Classes="horizontal">
-                                <ip:PackIconMaterialDesign Kind="{Binding Icon}" />
-                                <TextBlock Text="{Binding Name}" />
-                            </StackPanel>
-                        </Button>
-                    </DataTemplate>
-
-                    <DataTemplate DataType="im:AddMark">
-                        <DropDownButton Content="{ip:MaterialDesign Add}">
-                            <DropDownButton.Flyout>
-                                <MenuFlyout>
-                                    <MenuItem Header="FTP"
-                                              Command="{Binding $parent[ui:FilesPanelView].ViewModel.ShowCreateFtpCommand}" />
-                                </MenuFlyout>
-                            </DropDownButton.Flyout>
-                        </DropDownButton>
-                    </DataTemplate>
-                </s:SelectorDataTemplate>
+                <DataTemplate DataType="m:RootDirectory">
+                    <Button
+                        Command="{Binding $parent[ui:FilesPanelView].ViewModel.OpenSecondRootDirectoryCommand}"
+                        CommandParameter="{Binding}">
+                        <StackPanel Classes="horizontal">
+                            <ip:PackIconMaterialDesign Kind="{Binding Icon}" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </Button>
+                </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 

@@ -2,9 +2,9 @@
 
 namespace Cai.Ui;
 
-public partial class CreateFtpView : UserControl
+public partial class FilesPanelHeaderView : UserControl
 {
-    public CreateFtpView()
+    public FilesPanelHeaderView()
     {
         InitializeComponent();
     }
