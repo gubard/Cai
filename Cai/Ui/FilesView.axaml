@@ -1,0 +1,29 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="clr-namespace:Cai.Ui"
+             xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Cai.Ui.FilesView"
+             x:DataType="ui:FilesViewModel">
+    <Grid RowDefinitions="Auto,*">
+        <TextBlock Text="{Binding Directory.FullName}" />
+
+        <ScrollViewer Grid.Row="1" Classes="vertical-scroll">
+            <ItemsControl ItemsSource="{Binding Files}" PointerPressed="ItemsControlOnPointerPressed">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Classes="cr-5 align-stretch m-3 p-5"
+                                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+                            <StackPanel Classes="horizontal">
+                                <iconPacks:PackIconMaterialDesign Kind="{Binding Icon}" />
+                                <TextBlock Text="{Binding Name}" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
