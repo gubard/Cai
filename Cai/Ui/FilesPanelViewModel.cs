@@ -12,6 +12,7 @@ namespace Cai.Ui;
 public partial class FilesPanelViewModel : ViewModelBase, IHeader
 {
     private readonly ICaiViewModelFactory _factory;
+    private readonly IUiFilesService _uiFilesService;
 
     [ObservableProperty]
     private object _firstFiles;
@@ -22,10 +23,12 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
     public FilesPanelViewModel(
         ICaiViewModelFactory factory,
         IStorageService storageService,
-        IFilesCache filesCache
+        IFilesCache filesCache,
+        IUiFilesService uiFilesService
     )
     {
         _factory = factory;
+        _uiFilesService = uiFilesService;
         Roots = filesCache.Roots;
         _firstFiles = factory.Create(storageService.GetDbDirectory());
         _secondFiles = factory.Create(storageService.GetDbDirectory());
@@ -34,6 +37,12 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
 
     public object Header { get; }
     public IEnumerable<RootDirectory> Roots { get; }
+
+    [RelayCommand]
+    private async Task InitializedAsync(CancellationToken ct)
+    {
+        await WrapCommand(() => _uiFilesService.GetAsync(new() { IsGetFiles = true }, ct));
+    }
 
     [RelayCommand]
     private void OpenFirstRootDirectory(RootDirectory file)
