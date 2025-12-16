@@ -99,16 +99,22 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
     private async Task CopyFromFirstToSecondAsync(IEnumerable<File> files, CancellationToken ct)
     {
         await WrapCommand(() =>
-            SecondFiles.SaveFilesAsync(files.SelectMany(x => x.GetFileData()), ct)
-        );
+        {
+            var fileData = files.Where(x => x.Name != "..").SelectMany(x => x.GetFileData());
+
+            return SecondFiles.SaveFilesAsync(fileData, ct);
+        });
     }
 
     [RelayCommand]
     private async Task CopyFromSecondToFirstAsync(IEnumerable<File> files, CancellationToken ct)
     {
         await WrapCommand(() =>
-            FirstFiles.SaveFilesAsync(files.SelectMany(x => x.GetFileData()), ct)
-        );
+        {
+            var fileData = files.Where(x => x.Name != "..").SelectMany(x => x.GetFileData());
+
+            return FirstFiles.SaveFilesAsync(fileData, ct);
+        });
     }
 
     [RelayCommand]
