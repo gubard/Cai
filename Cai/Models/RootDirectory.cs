@@ -3,6 +3,20 @@ using IconPacks.Avalonia.MaterialDesign;
 
 namespace Cai.Models;
 
+public class DriveRootDirectory
+{
+    public DriveRootDirectory(string name, DriveInfo drive)
+    {
+        Name = name;
+        Drive = drive;
+        Icon = PackIconMaterialDesignKind.Folder;
+    }
+
+    public string Name { get; }
+    public DriveInfo Drive { get; }
+    public PackIconMaterialDesignKind Icon { get; }
+}
+
 public class RootDirectory
 {
     public RootDirectory(string name, DirectoryInfo directory)

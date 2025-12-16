@@ -73,6 +73,7 @@ public partial class FilesPanelViewModel : ViewModelBase
     private void CreateFtp(CreateFtpViewModel viewModel)
     {
         WrapCommand(() =>
+        {
             _roots.Insert(
                 _roots.Count - 1,
                 new FtpRootDirectory(
@@ -81,8 +82,10 @@ public partial class FilesPanelViewModel : ViewModelBase
                     viewModel.Login,
                     viewModel.Password
                 )
-            )
-        );
+            );
+
+            _dialogService.CloseMessageBox();
+        });
     }
 
     [RelayCommand]
@@ -122,6 +125,26 @@ public partial class FilesPanelViewModel : ViewModelBase
         {
             (SecondFiles as IDisposable)?.Dispose();
             SecondFiles = _factory.Create(file.CreateFtpClient());
+        });
+    }
+
+    [RelayCommand]
+    private void OpenFirstDriveRootDirectory(DriveRootDirectory file)
+    {
+        WrapCommand(() =>
+        {
+            (FirstFiles as IDisposable)?.Dispose();
+            FirstFiles = _factory.Create(new DirectoryInfo(file.Name));
+        });
+    }
+
+    [RelayCommand]
+    private void OpenSecondDriveRootDirectory(DriveRootDirectory file)
+    {
+        WrapCommand(() =>
+        {
+            (SecondFiles as IDisposable)?.Dispose();
+            SecondFiles = _factory.Create(new DirectoryInfo(file.Name));
         });
     }
 }

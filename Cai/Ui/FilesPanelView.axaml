@@ -14,6 +14,17 @@
         <ItemsControl Classes="horizontal-wrap" ItemsSource="{Binding Roots}">
             <ItemsControl.ItemTemplate>
                 <s:SelectorDataTemplate>
+                    <DataTemplate DataType="m:DriveRootDirectory">
+                        <Button
+                            Command="{Binding $parent[ui:FilesPanelView].ViewModel.OpenFirstDriveRootDirectoryCommand}"
+                            CommandParameter="{Binding}">
+                            <StackPanel Classes="horizontal">
+                                <ip:PackIconMaterialDesign Kind="{Binding Icon}" />
+                                <TextBlock Text="{Binding Name}" />
+                            </StackPanel>
+                        </Button>
+                    </DataTemplate>
+
                     <DataTemplate DataType="m:RootDirectory">
                         <Button Command="{Binding $parent[ui:FilesPanelView].ViewModel.OpenFirstRootDirectoryCommand}"
                                 CommandParameter="{Binding}">
@@ -52,6 +63,17 @@
         <ItemsControl Grid.Column="1" Classes="horizontal-wrap" ItemsSource="{Binding Roots}">
             <ItemsControl.ItemTemplate>
                 <s:SelectorDataTemplate>
+                    <DataTemplate DataType="m:DriveRootDirectory">
+                        <Button
+                            Command="{Binding $parent[ui:FilesPanelView].ViewModel.OpenSecondDriveRootDirectoryCommand}"
+                            CommandParameter="{Binding}">
+                            <StackPanel Classes="horizontal">
+                                <ip:PackIconMaterialDesign Kind="{Binding Icon}" />
+                                <TextBlock Text="{Binding Name}" />
+                            </StackPanel>
+                        </Button>
+                    </DataTemplate>
+
                     <DataTemplate DataType="m:RootDirectory">
                         <Button Command="{Binding $parent[ui:FilesPanelView].ViewModel.OpenSecondRootDirectoryCommand}"
                                 CommandParameter="{Binding}">
