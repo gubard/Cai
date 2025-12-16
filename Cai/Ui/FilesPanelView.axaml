@@ -23,7 +23,14 @@
                         CommandParameter="{Binding}">
                         <StackPanel Classes="horizontal">
                             <ip:PackIconMaterialDesign Kind="{Binding Icon}" />
-                            <TextBlock Text="{Binding Name}" />
+                            <TextBlock Classes="align-center" Text="{Binding Name}" />
+
+                            <Button Classes="mini"
+                                    IsVisible="{Binding !IsFrozen}"
+                                    Command="{Binding $parent[ui:FilesPanelView].ViewModel.DeleteRootDirectoryCommand}"
+                                    CommandParameter="{Binding}">
+                                <ip:PackIconMaterialDesign Classes="small" Kind="Delete" />
+                            </Button>
                         </StackPanel>
                     </Button>
                 </DataTemplate>
@@ -38,7 +45,14 @@
                         CommandParameter="{Binding}">
                         <StackPanel Classes="horizontal">
                             <ip:PackIconMaterialDesign Kind="{Binding Icon}" />
-                            <TextBlock Text="{Binding Name}" />
+                            <TextBlock Classes="align-center" Text="{Binding Name}" />
+
+                            <Button Classes="mini"
+                                    IsVisible="{Binding !IsFrozen}"
+                                    Command="{Binding $parent[ui:FilesPanelView].ViewModel.DeleteRootDirectoryCommand}"
+                                    CommandParameter="{Binding}">
+                                <ip:PackIconMaterialDesign Classes="small" Kind="Delete" />
+                            </Button>
                         </StackPanel>
                     </Button>
                 </DataTemplate>

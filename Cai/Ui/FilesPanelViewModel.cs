@@ -1,5 +1,4 @@
-﻿using Avalonia.Collections;
-using Cai.Models;
+﻿using Cai.Models;
 using Cai.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -60,10 +59,10 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
             FirstFiles = file switch
             {
                 DriveRootDirectory drive => _factory.Create(
-                    (new DirectoryInfo(drive.Drive.Name), CopyFromFirstToSecondCommand)
+                    (new(drive.Drive.Name), CopyFromFirstToSecondCommand)
                 ),
                 FtpRootDirectory ftp => _factory.Create(
-                    (new FtpClient(ftp.Host, ftp.Login, ftp.Password), CopyFromFirstToSecondCommand)
+                    (new(ftp.Host, ftp.Login, ftp.Password), ftp.Path, CopyFromFirstToSecondCommand)
                 ),
                 LocalRootDirectory local => _factory.Create(
                     (local.Directory, CopyFromFirstToSecondCommand)
@@ -83,10 +82,10 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
             SecondFiles = file switch
             {
                 DriveRootDirectory drive => _factory.Create(
-                    (new DirectoryInfo(drive.Drive.Name), CopyFromSecondToFirstCommand)
+                    (new(drive.Drive.Name), CopyFromSecondToFirstCommand)
                 ),
                 FtpRootDirectory ftp => _factory.Create(
-                    (new FtpClient(ftp.Host, ftp.Login, ftp.Password), CopyFromSecondToFirstCommand)
+                    (new(ftp.Host, ftp.Login, ftp.Password), ftp.Path, CopyFromSecondToFirstCommand)
                 ),
                 LocalRootDirectory local => _factory.Create(
                     (local.Directory, CopyFromSecondToFirstCommand)
@@ -110,5 +109,11 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
         await WrapCommand(() =>
             FirstFiles.SaveFilesAsync(files.SelectMany(x => x.GetFileData()), ct)
         );
+    }
+
+    [RelayCommand]
+    private async Task DeleteRootDirectoryAsync(RootDirectory file, CancellationToken ct)
+    {
+        await WrapCommand(() => _uiFilesService.PostAsync(new() { DeleteIds = [file.Id] }, ct));
     }
 }

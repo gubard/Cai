@@ -9,17 +9,22 @@
              x:Class="Cai.Ui.FilesView"
              x:DataType="ui:FilesViewModel">
     <Grid RowDefinitions="Auto,Auto,*">
-        <StackPanel Classes="horizontal">
+        <StackPanel Classes="horizontal"
+                    IsEnabled="{Binding SelectedFiles.Count, Converter={StaticResource IsNotValueConverter}, ConverterParameter={x:Static h:Numbers.Int32Zero}}">
             <Button Command="{Binding CopyCommand}"
-                    CommandParameter="{Binding Selected}"
-                    Content="{ip:MaterialDesign FileCopy}"
-                    IsEnabled="{Binding Selected.Count, Converter={StaticResource IsNotValueConverter}, ConverterParameter={x:Static h:Numbers.Int32Zero}}" />
+                    CommandParameter="{Binding SelectedFiles}"
+                    Content="{ip:MaterialDesign FileCopy}" />
+            <Button Command="{Binding DeleteCommand}"
+                    Content="{ip:MaterialDesign Delete}" />
         </StackPanel>
 
-        <TextBlock Grid.Row="1" Text="{Binding Directory.FullName}" />
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
+            <TextBlock Classes="align-left-center" Text="{Binding Directory.FullName}" />
+            <Button Grid.Column="1" Command="{Binding SaveDirectoryCommand}" Content="{ip:MaterialDesign Favorite}" />
+        </Grid>
 
         <ScrollViewer Grid.Row="2" Classes="vertical-scroll">
-            <ListBox ItemsSource="{Binding Files}" SelectionMode="Multiple" SelectedItems="{Binding Selected}">
+            <ListBox ItemsSource="{Binding Files}" SelectionMode="Multiple" SelectedItems="{Binding SelectedFiles}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border Classes="align-stretch" Background="Transparent">

@@ -39,4 +39,14 @@ public partial class FtpParametersView : UserControl
 
         TextBoxPassword.Focus();
     }
+
+    private void TextBoxPasswordOnKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter)
+        {
+            return;
+        }
+
+        TextBoxPassword.Focus();
+    }
 }

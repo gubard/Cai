@@ -1,6 +1,8 @@
 ﻿using Aya.Contract.Models;
 using Cai.Services;
 using CommunityToolkit.Mvvm.Input;
+using FluentFTP;
+using Gaia.Helpers;
 using Gaia.Services;
 using Inanna.Helpers;
 using Inanna.Models;
@@ -61,6 +63,13 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
     {
         await WrapCommand(async () =>
         {
+            using var client = new FtpClient(viewModel.Host, viewModel.Login, viewModel.Password);
+            client.Connect();
+
+            var path = viewModel.Path.IsNullOrWhiteSpace()
+                ? client.GetWorkingDirectory()
+                : viewModel.Path;
+
             var response = await _uiFilesService.PostAsync(
                 new()
                 {
@@ -73,6 +82,8 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
                             Host = viewModel.Host,
                             Login = viewModel.Login,
                             Password = viewModel.Password,
+                            Id = Guid.NewGuid(),
+                            Path = path,
                         },
                     ],
                 },

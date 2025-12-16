@@ -42,15 +42,16 @@ public class LocalFile : File
     {
         switch (Item)
         {
-            case DirectoryInfo directoryInfo:
-                var files = directoryInfo.GetFiles("*", SearchOption.AllDirectories);
+            case DirectoryInfo directory:
+                var files = directory.GetFiles("*", SearchOption.AllDirectories);
 
                 foreach (var file in files)
                 {
                     var length = file.FullName.Length - Item.FullName.Length;
                     var path = file.FullName.Substring(Item.FullName.Length, length);
+                    var filePath = Path.Combine(Item.Name, path.TrimStart('\\').TrimStart('/'));
 
-                    yield return new(path, file.OpenRead());
+                    yield return new(filePath, file.OpenRead());
                 }
 
                 break;
@@ -107,12 +108,18 @@ public class FtpFile : File
 
                 foreach (var file in files)
                 {
+                    if (file.Type != FtpObjectType.File)
+                    {
+                        continue;
+                    }
+
                     var length = file.FullName.Length - Item.FullName.Length;
                     var path = file.FullName.Substring(Item.FullName.Length, length);
                     var stream = new MemoryStream();
                     _ftpClient.DownloadStream(stream, file.FullName);
+                    var filePath = Path.Combine(Item.Name, path.TrimStart('\\').TrimStart('/'));
 
-                    yield return new(path, stream);
+                    yield return new(filePath, stream);
                 }
 
                 break;

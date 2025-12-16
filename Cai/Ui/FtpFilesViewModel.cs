@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows.Input;
 using Avalonia.Collections;
+using Aya.Contract.Models;
 using Cai.Models;
 using Cai.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -17,25 +18,31 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
     [ObservableProperty]
     private FtpFile _directory;
     private readonly FtpClient _ftpClient;
+    private readonly IUiFilesService _uiFilesService;
     private readonly AvaloniaList<FtpFile> _files;
-    private readonly AvaloniaList<FtpFile> _selected;
+    private readonly AvaloniaList<FtpFile> _selectedFiles;
 
-    public FtpFilesViewModel(FtpClient ftpClient, ICommand copyCommand)
+    public FtpFilesViewModel(
+        FtpClient ftpClient,
+        string path,
+        ICommand copyCommand,
+        IUiFilesService uiFilesService
+    )
     {
         _files = [];
-        _selected = [];
+        _selectedFiles = [];
         _ftpClient = ftpClient;
         CopyCommand = copyCommand;
+        _uiFilesService = uiFilesService;
         ftpClient.Connect();
-        var workingDirectory = ftpClient.GetWorkingDirectory();
-        var item = ftpClient.GetObjectInfo(workingDirectory);
+        var item = ftpClient.GetObjectInfo(path);
         _directory = new(item, ftpClient);
         Update();
     }
 
     public IEnumerable<FtpFile> Files => _files;
     public ICommand CopyCommand { get; }
-    public IAvaloniaReadOnlyList<FtpFile> Selected => _selected;
+    public IAvaloniaReadOnlyList<FtpFile> SelectedFiles => _selectedFiles;
 
     public void Dispose()
     {
@@ -131,6 +138,67 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
                     break;
                 }
             }
+        });
+    }
+
+    [RelayCommand]
+    private async Task SaveDirectoryAsync(CancellationToken ct)
+    {
+        await WrapCommand(() =>
+            _uiFilesService.PostAsync(
+                new()
+                {
+                    CreateFiles =
+                    [
+                        new()
+                        {
+                            Name = Directory.Item.Name,
+                            Id = Guid.NewGuid(),
+                            Path = Directory.Item.FullName,
+                            Type = FileType.Ftp,
+                            Host = _ftpClient.Host,
+                            Login = _ftpClient.Credentials.UserName,
+                            Password = _ftpClient.Credentials.Password,
+                        },
+                    ],
+                },
+                ct
+            )
+        );
+    }
+
+    [RelayCommand]
+    private void Delete()
+    {
+        WrapCommand(() =>
+        {
+            foreach (var selectedFile in SelectedFiles)
+            {
+                if (selectedFile.Name == "..")
+                {
+                    continue;
+                }
+
+                switch (selectedFile.Item.Type)
+                {
+                    case FtpObjectType.File:
+                        _ftpClient.DeleteFile(selectedFile.Item.FullName);
+                        break;
+                    case FtpObjectType.Directory:
+                        _ftpClient.DeleteDirectory(
+                            selectedFile.Item.FullName,
+                            FtpListOption.AllFiles
+                                | FtpListOption.ForceList
+                                | FtpListOption.Recursive
+                        );
+                        break;
+                    case FtpObjectType.Link:
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            Update();
         });
     }
 }

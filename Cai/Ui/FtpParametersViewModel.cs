@@ -17,11 +17,15 @@ public partial class FtpParametersViewModel : ViewModelBase
     [ObservableProperty]
     private string _password;
 
+    [ObservableProperty]
+    private string _path;
+
     public FtpParametersViewModel()
     {
         _name = string.Empty;
         _host = string.Empty;
         _login = string.Empty;
         _password = string.Empty;
+        _path = string.Empty;
     }
 }

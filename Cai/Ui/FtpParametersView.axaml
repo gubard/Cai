@@ -14,6 +14,8 @@
         <TextBlock Classes="field" Text="{DynamicResource Lang.Login}" />
         <TextBox x:Name="TextBoxLogin" Text="{Binding Login}" KeyDown="TextBoxLoginOnKeyDown" />
         <TextBlock Classes="field" Text="{DynamicResource Lang.Password}" />
-        <TextBox x:Name="TextBoxPassword" Classes="password" Text="{Binding Password}" />
+        <TextBox x:Name="TextBoxPassword" Classes="password" Text="{Binding Password}" KeyDown="TextBoxPasswordOnKeyDown" />
+        <TextBlock Classes="field" Text="{DynamicResource Lang.Path}" />
+        <TextBox x:Name="TextBoxPath" Text="{Binding Path}" />
     </StackPanel>
 </UserControl>

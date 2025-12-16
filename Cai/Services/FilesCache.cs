@@ -38,8 +38,15 @@ public class FilesCache : IFilesCache
                             x.Type switch
                             {
                                 FileType.Ftp => (RootDirectory)
-                                    new FtpRootDirectory(x.Name, x.Host, x.Login, x.Password),
-                                FileType.Local => new LocalRootDirectory(new(x.Path)),
+                                    new FtpRootDirectory(
+                                        x.Id,
+                                        x.Name,
+                                        x.Host,
+                                        x.Login,
+                                        x.Password,
+                                        x.Path
+                                    ),
+                                FileType.Local => new LocalRootDirectory(x.Id, new(x.Path)),
                                 _ => throw new ArgumentOutOfRangeException(),
                             }
                         )
@@ -55,11 +62,13 @@ public class FilesCache : IFilesCache
                 x.Type switch
                 {
                     FileType.Ftp => (RootDirectory)
-                        new FtpRootDirectory(x.Name, x.Host, x.Login, x.Password),
-                    FileType.Local => new LocalRootDirectory(new(x.Path)),
+                        new FtpRootDirectory(x.Id, x.Name, x.Host, x.Login, x.Password, x.Path),
+                    FileType.Local => new LocalRootDirectory(x.Id, new(x.Path)),
                     _ => throw new ArgumentOutOfRangeException(),
                 }
             )
         );
+
+        _roots.RemoveAll(_roots.Where(x => source.DeleteIds.Contains(x.Id)));
     }
 }

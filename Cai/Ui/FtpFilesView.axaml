@@ -9,20 +9,27 @@
              x:Class="Cai.Ui.FtpFilesView"
              x:DataType="ui:FtpFilesViewModel">
     <Grid RowDefinitions="Auto,Auto,*">
-        <StackPanel Classes="horizontal">
+        <StackPanel Classes="horizontal"
+                    IsEnabled="{Binding SelectedFiles.Count, Converter={StaticResource IsNotValueConverter}, ConverterParameter={x:Static h:Numbers.Int32Zero}}">
             <Button Command="{Binding CopyCommand}"
-                    CommandParameter="{Binding Selected}"
-                    Content="{ip:MaterialDesign FileCopy}"
-                    IsEnabled="{Binding Selected.Count, Converter={StaticResource IsNotValueConverter}, ConverterParameter={x:Static h:Numbers.Int32Zero}}" />
+                    CommandParameter="{Binding SelectedFiles}"
+                    Content="{ip:MaterialDesign FileCopy}" />
+            <Button Command="{Binding DeleteCommand}"
+                    Content="{ip:MaterialDesign Delete}" />
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Classes="horizontal">
-            <TextBlock Text="ftp:/" />
-            <TextBlock Text="{Binding Directory.Item.FullName}" />
-        </StackPanel>
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
+            <StackPanel Classes="horizontal align-left-center">
+                <TextBlock Text="ftp:/" />
+                <TextBlock Text="{Binding Directory.Item.FullName}" />
+            </StackPanel>
+
+            <Button Grid.Column="1" Command="{Binding SaveDirectoryCommand}" Content="{ip:MaterialDesign Favorite}" />
+        </Grid>
+
 
         <ScrollViewer Grid.Row="2" Classes="vertical-scroll">
-            <ListBox ItemsSource="{Binding Files}" SelectionMode="Multiple" SelectedItems="{Binding Selected}">
+            <ListBox ItemsSource="{Binding Files}" SelectionMode="Multiple" SelectedItems="{Binding SelectedFiles}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border Classes="align-stretch" Background="Transparent">
