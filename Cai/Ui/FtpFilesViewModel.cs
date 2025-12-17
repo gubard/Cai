@@ -148,33 +148,35 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
     [RelayCommand]
     private async Task SaveDirectoryAsync(CancellationToken ct)
     {
-        await WrapCommand(() =>
-            _uiFilesService.PostAsync(
-                new()
-                {
-                    CreateFiles =
-                    [
-                        new()
-                        {
-                            Name = Directory.Item.Name,
-                            Id = Guid.NewGuid(),
-                            Path = Directory.Item.FullName,
-                            Type = FileType.Ftp,
-                            Host = _ftpClient.Host,
-                            Login = _ftpClient.Credentials.UserName,
-                            Password = _ftpClient.Credentials.Password,
-                        },
-                    ],
-                },
-                ct
-            )
+        await WrapCommandAsync(
+            () =>
+                _uiFilesService.PostAsync(
+                    new()
+                    {
+                        CreateFiles =
+                        [
+                            new()
+                            {
+                                Name = Directory.Item.Name,
+                                Id = Guid.NewGuid(),
+                                Path = Directory.Item.FullName,
+                                Type = FileType.Ftp,
+                                Host = _ftpClient.Host,
+                                Login = _ftpClient.Credentials.UserName,
+                                Password = _ftpClient.Credentials.Password,
+                            },
+                        ],
+                    },
+                    ct
+                ),
+            ct
         );
     }
 
     [RelayCommand]
     private async Task CopyFullPathAsync(FtpFile ftpFile, CancellationToken ct)
     {
-        await WrapCommand(() => _clipboardService.SetTextAsync(ftpFile.Item.FullName, ct));
+        await WrapCommandAsync(() => _clipboardService.SetTextAsync(ftpFile.Item.FullName, ct), ct);
     }
 
     [RelayCommand]

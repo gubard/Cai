@@ -45,7 +45,7 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
     [RelayCommand]
     private async Task InitializedAsync(CancellationToken ct)
     {
-        await WrapCommand(() => _uiFilesService.GetAsync(new() { IsGetFiles = true }, ct));
+        await WrapCommandAsync(() => _uiFilesService.GetAsync(new() { IsGetFiles = true }, ct), ct);
     }
 
     [RelayCommand]
@@ -97,28 +97,37 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
     [RelayCommand]
     private async Task CopyFromFirstToSecondAsync(IEnumerable<File> files, CancellationToken ct)
     {
-        await WrapCommand(() =>
-        {
-            var fileData = files.Where(x => x.Name != "..").SelectMany(x => x.GetFileData());
+        await WrapCommandAsync(
+            () =>
+            {
+                var fileData = files.Where(x => x.Name != "..").SelectMany(x => x.GetFileData());
 
-            return SecondFiles.SaveFilesAsync(fileData, ct);
-        });
+                return SecondFiles.SaveFilesAsync(fileData, ct);
+            },
+            ct
+        );
     }
 
     [RelayCommand]
     private async Task CopyFromSecondToFirstAsync(IEnumerable<File> files, CancellationToken ct)
     {
-        await WrapCommand(() =>
-        {
-            var fileData = files.Where(x => x.Name != "..").SelectMany(x => x.GetFileData());
+        await WrapCommandAsync(
+            () =>
+            {
+                var fileData = files.Where(x => x.Name != "..").SelectMany(x => x.GetFileData());
 
-            return FirstFiles.SaveFilesAsync(fileData, ct);
-        });
+                return FirstFiles.SaveFilesAsync(fileData, ct);
+            },
+            ct
+        );
     }
 
     [RelayCommand]
     private async Task DeleteRootDirectoryAsync(RootDirectory file, CancellationToken ct)
     {
-        await WrapCommand(() => _uiFilesService.PostAsync(new() { DeleteIds = [file.Id] }, ct));
+        await WrapCommandAsync(
+            () => _uiFilesService.PostAsync(new() { DeleteIds = [file.Id] }, ct),
+            ct
+        );
     }
 }

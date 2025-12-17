@@ -116,23 +116,25 @@ public partial class FilesViewModel : ViewModelBase, IFilesView
     [RelayCommand]
     private async Task SaveDirectoryAsync(CancellationToken ct)
     {
-        await WrapCommand(() =>
-            _uiFilesService.PostAsync(
-                new()
-                {
-                    CreateFiles =
-                    [
-                        new()
-                        {
-                            Name = Directory.Name,
-                            Id = Guid.NewGuid(),
-                            Path = Directory.FullName,
-                            Type = FileType.Local,
-                        },
-                    ],
-                },
-                ct
-            )
+        await WrapCommandAsync(
+            () =>
+                _uiFilesService.PostAsync(
+                    new()
+                    {
+                        CreateFiles =
+                        [
+                            new()
+                            {
+                                Name = Directory.Name,
+                                Id = Guid.NewGuid(),
+                                Path = Directory.FullName,
+                                Type = FileType.Local,
+                            },
+                        ],
+                    },
+                    ct
+                ),
+            ct
         );
     }
 
@@ -174,6 +176,9 @@ public partial class FilesViewModel : ViewModelBase, IFilesView
     [RelayCommand]
     private async Task CopyFullPathAsync(LocalFile localFile, CancellationToken ct)
     {
-        await WrapCommand(() => _clipboardService.SetTextAsync(localFile.Item.FullName, ct));
+        await WrapCommandAsync(
+            () => _clipboardService.SetTextAsync(localFile.Item.FullName, ct),
+            ct
+        );
     }
 }

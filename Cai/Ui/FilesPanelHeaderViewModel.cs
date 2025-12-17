@@ -35,64 +35,76 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task ShowCreateFtpAsync()
+    private async Task ShowCreateFtpAsync(CancellationToken ct)
     {
-        await WrapCommand(() =>
-        {
-            var creatingNewItem = _appResourceService.GetResource<string>("Lang.CreatingNewItem");
-            var create = _appResourceService.GetResource<string>("Lang.Create");
-            var header = _stringFormater.Format(creatingNewItem, "FTP");
-            var viewModel = _factory.CreateFtpParameters();
+        await WrapCommandAsync(
+            () =>
+            {
+                var creatingNewItem = _appResourceService.GetResource<string>(
+                    "Lang.CreatingNewItem"
+                );
+                var create = _appResourceService.GetResource<string>("Lang.Create");
+                var header = _stringFormater.Format(creatingNewItem, "FTP");
+                var viewModel = _factory.CreateFtpParameters();
 
-            var createFtpButton = new DialogButton(
-                create,
-                CreateFtpCommand,
-                viewModel,
-                DialogButtonType.Primary
-            );
+                var createFtpButton = new DialogButton(
+                    create,
+                    CreateFtpCommand,
+                    viewModel,
+                    DialogButtonType.Primary
+                );
 
-            var buttons = new[] { createFtpButton, UiHelper.CancelButton };
-            var dialog = new DialogViewModel(header, viewModel, buttons);
+                var buttons = new[] { createFtpButton, UiHelper.CancelButton };
+                var dialog = new DialogViewModel(header, viewModel, buttons);
 
-            return _dialogService.ShowMessageBoxAsync(dialog);
-        });
+                return _dialogService.ShowMessageBoxAsync(dialog, ct);
+            },
+            ct
+        );
     }
 
     [RelayCommand]
     private async Task CreateFtp(FtpParametersViewModel viewModel, CancellationToken ct)
     {
-        await WrapCommand(async () =>
-        {
-            using var client = new FtpClient(viewModel.Host, viewModel.Login, viewModel.Password);
-            client.Connect();
+        await WrapCommandAsync(
+            async () =>
+            {
+                using var client = new FtpClient(
+                    viewModel.Host,
+                    viewModel.Login,
+                    viewModel.Password
+                );
+                client.Connect();
 
-            var path = viewModel.Path.IsNullOrWhiteSpace()
-                ? client.GetWorkingDirectory()
-                : viewModel.Path;
+                var path = viewModel.Path.IsNullOrWhiteSpace()
+                    ? client.GetWorkingDirectory()
+                    : viewModel.Path;
 
-            var response = await _uiFilesService.PostAsync(
-                new()
-                {
-                    CreateFiles =
-                    [
-                        new()
-                        {
-                            Name = viewModel.Name,
-                            Type = FileType.Ftp,
-                            Host = viewModel.Host,
-                            Login = viewModel.Login,
-                            Password = viewModel.Password,
-                            Id = Guid.NewGuid(),
-                            Path = path,
-                        },
-                    ],
-                },
-                ct
-            );
+                var response = await _uiFilesService.PostAsync(
+                    new()
+                    {
+                        CreateFiles =
+                        [
+                            new()
+                            {
+                                Name = viewModel.Name,
+                                Type = FileType.Ftp,
+                                Host = viewModel.Host,
+                                Login = viewModel.Login,
+                                Password = viewModel.Password,
+                                Id = Guid.NewGuid(),
+                                Path = path,
+                            },
+                        ],
+                    },
+                    ct
+                );
 
-            _dialogService.CloseMessageBox();
+                _dialogService.CloseMessageBox();
 
-            return response;
-        });
+                return response;
+            },
+            ct
+        );
     }
 }
