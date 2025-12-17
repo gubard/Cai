@@ -117,6 +117,7 @@ public class FtpFile : File
                     var path = file.FullName.Substring(Item.FullName.Length, length);
                     var stream = new MemoryStream();
                     _ftpClient.DownloadStream(stream, file.FullName);
+                    stream.Position = 0;
                     var filePath = Path.Combine(Item.Name, path.TrimStart('\\').TrimStart('/'));
 
                     yield return new(filePath, stream);
@@ -128,6 +129,7 @@ public class FtpFile : File
             {
                 var stream = new MemoryStream();
                 _ftpClient.DownloadStream(stream, Item.FullName);
+                stream.Position = 0;
 
                 yield return new(Item.Name, stream);
 

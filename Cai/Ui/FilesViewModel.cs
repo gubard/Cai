@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 using Gaia.Models;
 using IconPacks.Avalonia.MaterialDesign;
 using Inanna.Models;
+using Inanna.Services;
 
 namespace Cai.Ui;
 
@@ -19,16 +20,19 @@ public partial class FilesViewModel : ViewModelBase, IFilesView
     private readonly AvaloniaList<LocalFile> _files;
     private readonly AvaloniaList<LocalFile> _selectedFiles;
     private readonly IUiFilesService _uiFilesService;
+    private readonly IClipboardService _clipboardService;
 
     public FilesViewModel(
         DirectoryInfo directory,
         ICommand copyCommand,
-        IUiFilesService uiFilesService
+        IUiFilesService uiFilesService,
+        IClipboardService clipboardService
     )
     {
         _directory = directory;
         CopyCommand = copyCommand;
         _uiFilesService = uiFilesService;
+        _clipboardService = clipboardService;
         _files = [];
         _selectedFiles = [];
         Update();
@@ -165,5 +169,11 @@ public partial class FilesViewModel : ViewModelBase, IFilesView
 
         _files.AddRange(directories);
         _files.AddRange(Directory.GetFiles().OrderBy(x => x.Name).Select(x => new LocalFile(x)));
+    }
+
+    [RelayCommand]
+    private async Task CopyFullPathAsync(LocalFile localFile, CancellationToken ct)
+    {
+        await WrapCommand(() => _clipboardService.SetTextAsync(localFile.Item.FullName, ct));
     }
 }

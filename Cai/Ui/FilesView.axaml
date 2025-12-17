@@ -38,6 +38,14 @@
                                 </BehaviorCollection>
                             </Interaction.Behaviors>
 
+                            <Border.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuItem Header="{DynamicResource Lang.CopyFullPath}"
+                                              CommandParameter="{Binding}"
+                                              Command="{Binding $parent[ui:FilesView].ViewModel.CopyFullPathCommand}" />
+                                </MenuFlyout>
+                            </Border.ContextFlyout>
+
                             <StackPanel Classes="horizontal">
                                 <ip:PackIconMaterialDesign Kind="{Binding Icon}" />
                                 <TextBlock Text="{Binding Name}" />

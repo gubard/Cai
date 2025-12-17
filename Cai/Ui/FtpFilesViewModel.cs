@@ -10,6 +10,7 @@ using FluentFTP;
 using Gaia.Models;
 using IconPacks.Avalonia.MaterialDesign;
 using Inanna.Models;
+using Inanna.Services;
 
 namespace Cai.Ui;
 
@@ -21,12 +22,14 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
     private readonly IUiFilesService _uiFilesService;
     private readonly AvaloniaList<FtpFile> _files;
     private readonly AvaloniaList<FtpFile> _selectedFiles;
+    private readonly IClipboardService _clipboardService;
 
     public FtpFilesViewModel(
         FtpClient ftpClient,
         string path,
         ICommand copyCommand,
-        IUiFilesService uiFilesService
+        IUiFilesService uiFilesService,
+        IClipboardService clipboardService
     )
     {
         _files = [];
@@ -34,6 +37,7 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
         _ftpClient = ftpClient;
         CopyCommand = copyCommand;
         _uiFilesService = uiFilesService;
+        _clipboardService = clipboardService;
         ftpClient.Connect();
         var item = ftpClient.GetObjectInfo(path);
         _directory = new(item, ftpClient);
@@ -165,6 +169,12 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
                 ct
             )
         );
+    }
+
+    [RelayCommand]
+    private async Task CopyFullPathAsync(FtpFile ftpFile, CancellationToken ct)
+    {
+        await WrapCommand(() => _clipboardService.SetTextAsync(ftpFile.Item.FullName, ct));
     }
 
     [RelayCommand]
