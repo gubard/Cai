@@ -10,7 +10,7 @@
              x:DataType="ui:FtpFilesViewModel">
     <Grid RowDefinitions="Auto,Auto,*">
         <StackPanel Classes="horizontal"
-                    IsEnabled="{Binding SelectedFiles.Count, Converter={StaticResource IsNotValueConverter}, ConverterParameter={x:Static h:Numbers.Int32Zero}}">
+                    IsEnabled="{Binding SelectedFiles.Count, Converter={StaticResource IsNotValueConverter}, ConverterParameter={x:Static h:Numbers.Int32_0}}">
             <Button Command="{Binding CopyCommand}"
                     CommandParameter="{Binding SelectedFiles}"
                     Content="{ip:MaterialDesign FileCopy}" />
