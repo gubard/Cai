@@ -18,6 +18,7 @@ public partial class FtpParametersView : UserControl
         }
 
         TextBoxHost.Focus();
+        e.Handled = true;
     }
 
     private void TextBoxHostOnKeyDown(object? sender, KeyEventArgs e)
@@ -28,6 +29,7 @@ public partial class FtpParametersView : UserControl
         }
 
         TextBoxLogin.Focus();
+        e.Handled = true;
     }
 
     private void TextBoxLoginOnKeyDown(object? sender, KeyEventArgs e)
@@ -38,6 +40,7 @@ public partial class FtpParametersView : UserControl
         }
 
         TextBoxPassword.Focus();
+        e.Handled = true;
     }
 
     private void TextBoxPasswordOnKeyDown(object? sender, KeyEventArgs e)
@@ -48,5 +51,6 @@ public partial class FtpParametersView : UserControl
         }
 
         TextBoxPassword.Focus();
+        e.Handled = true;
     }
 }

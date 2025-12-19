@@ -9,6 +9,13 @@
              x:DataType="ui:FilesPanelHeaderViewModel">
     <Grid ColumnDefinitions="*,Auto">
         <TextBlock Classes="align-left-canter h2" Text="{DynamicResource Lang.Files}" />
-        <DropDownButton Grid.Column="1" Content="{ip:MaterialDesign Add}" Command="{Binding ShowCreateFtpCommand}" />
+
+        <DropDownButton Grid.Column="1" Content="{ip:MaterialDesign Add}">
+            <DropDownButton.Flyout>
+                <MenuFlyout>
+                    <MenuItem Header="FTP" Command="{Binding ShowCreateFtpCommand}" />
+                </MenuFlyout>
+            </DropDownButton.Flyout>
+        </DropDownButton>
     </Grid>
 </UserControl>
