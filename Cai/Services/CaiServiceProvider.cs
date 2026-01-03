@@ -9,6 +9,7 @@ using Gaia.Services;
 using Inanna.Models;
 using Inanna.Services;
 using Jab;
+using Nestor.Db.Services;
 using Nestor.Db.Sqlite.Helpers;
 
 namespace Cai.Services;
@@ -27,7 +28,8 @@ public interface ICaiServiceProvider
         AppState appState,
         IFilesCache toDoCache,
         INavigator navigator,
-        IStorageService storageService
+        IStorageService storageService,
+        IMigrator migrator
     )
     {
         var user = appState.User.ThrowIfNull();
@@ -44,9 +46,9 @@ public interface ICaiServiceProvider
                 headersFactory
             ),
             new EfFilesService(
-                new FileInfo(
-                    $"{storageService.GetAppDirectory()}/Cai/{user.Id}.db"
-                ).InitDbContext(),
+                new FileInfo($"{storageService.GetAppDirectory()}/Cai/{user.Id}.db").InitDbContext(
+                    migrator
+                ),
                 new(DateTimeOffset.UtcNow.Offset, user.Id)
             ),
             appState,
