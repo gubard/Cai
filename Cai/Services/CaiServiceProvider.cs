@@ -46,7 +46,7 @@ public interface ICaiServiceProvider
                 headersFactory
             ),
             new EfFilesService(
-                new FileInfo($"{storageService.GetAppDirectory()}/Cai/{user.Id}.db").InitDbContext(
+                new FileInfo($"{storageService.GetAppDirectory()}/{user.Id}.db").InitDbContext(
                     migrator
                 ),
                 new(DateTimeOffset.UtcNow.Offset, user.Id)
