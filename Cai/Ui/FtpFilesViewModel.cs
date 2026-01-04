@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Avalonia.Collections;
 using Aya.Contract.Models;
@@ -53,7 +54,15 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
         _ftpClient.Dispose();
     }
 
-    public async ValueTask SaveFilesAsync(IEnumerable<FileData> files, CancellationToken ct)
+    public ConfiguredValueTaskAwaitable SaveFilesAsync(
+        IEnumerable<FileData> files,
+        CancellationToken ct
+    )
+    {
+        return SaveFilesCore(files, ct).ConfigureAwait(false);
+    }
+
+    private async ValueTask SaveFilesCore(IEnumerable<FileData> files, CancellationToken ct)
     {
         using var dis = new Dis(Update);
 

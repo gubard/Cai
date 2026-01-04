@@ -1,8 +1,9 @@
-﻿using Cai.Models;
+﻿using System.Runtime.CompilerServices;
+using Cai.Models;
 
 namespace Cai.Services;
 
 public interface IFilesView : IDisposable
 {
-    ValueTask SaveFilesAsync(IEnumerable<FileData> files, CancellationToken ct);
+    ConfiguredValueTaskAwaitable SaveFilesAsync(IEnumerable<FileData> files, CancellationToken ct);
 }

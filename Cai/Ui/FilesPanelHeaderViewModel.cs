@@ -66,46 +66,43 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
     [RelayCommand]
     private async Task CreateFtpAsync(FtpParametersViewModel viewModel, CancellationToken ct)
     {
-        await WrapCommandAsync(
-            async () =>
+        await WrapCommandAsync(() => CreateFtpCore(viewModel, ct).ConfigureAwait(false), ct);
+    }
+
+    private async ValueTask<AyaPostResponse> CreateFtpCore(
+        FtpParametersViewModel viewModel,
+        CancellationToken ct
+    )
+    {
+        using var client = new FtpClient(viewModel.Host, viewModel.Login, viewModel.Password);
+        client.Connect();
+
+        var path = viewModel.Path.IsNullOrWhiteSpace()
+            ? client.GetWorkingDirectory()
+            : viewModel.Path;
+
+        var response = await _uiFilesService.PostAsync(
+            new()
             {
-                using var client = new FtpClient(
-                    viewModel.Host,
-                    viewModel.Login,
-                    viewModel.Password
-                );
-
-                client.Connect();
-
-                var path = viewModel.Path.IsNullOrWhiteSpace()
-                    ? client.GetWorkingDirectory()
-                    : viewModel.Path;
-
-                var response = await _uiFilesService.PostAsync(
+                CreateFiles =
+                [
                     new()
                     {
-                        CreateFiles =
-                        [
-                            new()
-                            {
-                                Name = viewModel.Name,
-                                Type = FileType.Ftp,
-                                Host = viewModel.Host,
-                                Login = viewModel.Login,
-                                Password = viewModel.Password,
-                                Id = Guid.NewGuid(),
-                                Path = path,
-                            },
-                        ],
+                        Name = viewModel.Name,
+                        Type = FileType.Ftp,
+                        Host = viewModel.Host,
+                        Login = viewModel.Login,
+                        Password = viewModel.Password,
+                        Id = Guid.NewGuid(),
+                        Path = path,
                     },
-                    ct
-                );
-
-                _dialogService.CloseMessageBox();
-
-                return response;
+                ],
             },
             ct
         );
+
+        _dialogService.CloseMessageBox();
+
+        return response;
     }
 }
