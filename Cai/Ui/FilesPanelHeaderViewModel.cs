@@ -64,7 +64,7 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task CreateFtp(FtpParametersViewModel viewModel, CancellationToken ct)
+    private async Task CreateFtpAsync(FtpParametersViewModel viewModel, CancellationToken ct)
     {
         await WrapCommandAsync(
             async () =>
@@ -74,6 +74,7 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
                     viewModel.Login,
                     viewModel.Password
                 );
+
                 client.Connect();
 
                 var path = viewModel.Path.IsNullOrWhiteSpace()

@@ -8,13 +8,14 @@
              x:DataType="ui:FtpParametersViewModel">
     <StackPanel>
         <TextBlock Classes="field" Text="{DynamicResource Lang.Name}" />
-        <TextBox x:Name="TextBoxName" Text="{Binding Name}" KeyDown="TextBoxNameOnKeyDown"/>
+        <TextBox x:Name="TextBoxName" Text="{Binding Name}" KeyDown="TextBoxNameOnKeyDown" />
         <TextBlock Classes="field" Text="{DynamicResource Lang.Host}" />
         <TextBox x:Name="TextBoxHost" Text="{Binding Host}" KeyDown="TextBoxHostOnKeyDown" />
         <TextBlock Classes="field" Text="{DynamicResource Lang.Login}" />
         <TextBox x:Name="TextBoxLogin" Text="{Binding Login}" KeyDown="TextBoxLoginOnKeyDown" />
         <TextBlock Classes="field" Text="{DynamicResource Lang.Password}" />
-        <TextBox x:Name="TextBoxPassword" Classes="password" Text="{Binding Password}" KeyDown="TextBoxPasswordOnKeyDown" />
+        <TextBox x:Name="TextBoxPassword" Classes="password" Text="{Binding Password}"
+                 KeyDown="TextBoxPasswordOnKeyDown" />
         <TextBlock Classes="field" Text="{DynamicResource Lang.Path}" />
         <TextBox x:Name="TextBoxPath" Text="{Binding Path}" />
     </StackPanel>

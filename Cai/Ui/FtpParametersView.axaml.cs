@@ -50,7 +50,7 @@ public partial class FtpParametersView : UserControl
             return;
         }
 
-        TextBoxPassword.Focus();
+        TextBoxPath.Focus();
         e.Handled = true;
     }
 }
