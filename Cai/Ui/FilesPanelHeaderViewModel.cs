@@ -1,4 +1,5 @@
-﻿using Aya.Contract.Models;
+﻿using Avalonia.Threading;
+using Aya.Contract.Models;
 using Cai.Services;
 using CommunityToolkit.Mvvm.Input;
 using FluentFTP;
@@ -101,7 +102,7 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
             ct
         );
 
-        _dialogService.CloseMessageBox();
+        Dispatcher.UIThread.Post(() => _dialogService.CloseMessageBox());
 
         return response;
     }
