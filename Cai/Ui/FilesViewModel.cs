@@ -128,6 +128,7 @@ public partial class FilesViewModel : ViewModelBase, IFilesView
         await WrapCommandAsync(
             () =>
                 _uiFilesService.PostAsync(
+                    Guid.NewGuid(),
                     new()
                     {
                         CreateFiles =

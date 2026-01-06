@@ -160,6 +160,7 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
         await WrapCommandAsync(
             () =>
                 _uiFilesService.PostAsync(
+                    Guid.NewGuid(),
                     new()
                     {
                         CreateFiles =

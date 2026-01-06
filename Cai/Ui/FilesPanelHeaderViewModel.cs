@@ -83,6 +83,7 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
             : viewModel.Path;
 
         var response = await _uiFilesService.PostAsync(
+            Guid.NewGuid(),
             new()
             {
                 CreateFiles =

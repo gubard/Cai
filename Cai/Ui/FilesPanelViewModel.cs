@@ -30,12 +30,15 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
         _factory = factory;
         _uiFilesService = uiFilesService;
         Roots = filesCache.Roots;
+
         _firstFiles = factory.Create(
             (storageService.GetDbDirectory(), CopyFromFirstToSecondCommand)
         );
+
         _secondFiles = factory.Create(
             (storageService.GetDbDirectory(), CopyFromSecondToFirstCommand)
         );
+
         Header = _factory.CreateFilesPanelHeader();
     }
 
@@ -126,7 +129,7 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
     private async Task DeleteRootDirectoryAsync(RootDirectory file, CancellationToken ct)
     {
         await WrapCommandAsync(
-            () => _uiFilesService.PostAsync(new() { DeleteIds = [file.Id] }, ct),
+            () => _uiFilesService.PostAsync(Guid.NewGuid(), new() { DeleteIds = [file.Id] }, ct),
             ct
         );
     }
