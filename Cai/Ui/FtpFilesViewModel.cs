@@ -64,7 +64,7 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
 
     private async ValueTask SaveFilesCore(IEnumerable<FileData> files, CancellationToken ct)
     {
-        using var dis = new Dis(Update);
+        using var dis = new Finally(Update);
 
         foreach (var file in files)
         {
