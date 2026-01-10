@@ -15,13 +15,13 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
     public FilesPanelViewModel(
         ICaiViewModelFactory factory,
         IStorageService storageService,
-        IFilesCache filesCache,
+        IFilesMemoryCache filesMemoryCache,
         IUiFilesService uiFilesService
     )
     {
         _factory = factory;
         _uiFilesService = uiFilesService;
-        Roots = filesCache.Roots;
+        Roots = filesMemoryCache.Roots;
 
         _firstFiles = factory.Create(
             (storageService.GetDbDirectory(), CopyFromFirstToSecondCommand)

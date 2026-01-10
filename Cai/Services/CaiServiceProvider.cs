@@ -6,5 +6,5 @@ namespace Cai.Services;
 [ServiceProviderModule]
 [Transient(typeof(ICaiViewModelFactory), typeof(CaiViewModelFactory))]
 [Transient(typeof(FilesPanelViewModel))]
-[Singleton(typeof(IFilesCache), typeof(FilesCache))]
+[Singleton(typeof(IFilesMemoryCache), typeof(FilesMemoryCache))]
 public interface ICaiServiceProvider;

@@ -7,16 +7,16 @@ using Inanna.Helpers;
 
 namespace Cai.Services;
 
-public interface IFilesCache : ICache<AyaGetResponse>, ICache<AyaPostRequest>
+public interface IFilesMemoryCache : IMemoryCache<AyaGetResponse>, IMemoryCache<AyaPostRequest>
 {
     IEnumerable<RootDirectory> Roots { get; }
 }
 
-public class FilesCache : IFilesCache
+public class FilesMemoryCache : IFilesMemoryCache
 {
     private readonly AvaloniaList<RootDirectory> _roots;
 
-    public FilesCache()
+    public FilesMemoryCache()
     {
         _roots = new(DriveHelper.Roots.ToArray().OfType<RootDirectory>());
     }

@@ -12,7 +12,7 @@ public class UiFilesService(
     IHttpFilesService httpService,
     IEfFilesService efService,
     AppState appState,
-    IFilesCache cache,
+    IFilesMemoryCache memoryCache,
     INavigator navigator,
     string serviceName
 )
@@ -23,6 +23,6 @@ public class UiFilesService(
         AyaPostResponse,
         IHttpFilesService,
         IEfFilesService,
-        IFilesCache
-    >(httpService, efService, appState, cache, navigator, serviceName),
+        IFilesMemoryCache
+    >(httpService, efService, appState, memoryCache, navigator, serviceName),
         IUiFilesService;
