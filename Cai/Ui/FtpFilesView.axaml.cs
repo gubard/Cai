@@ -15,7 +15,7 @@ public partial class FtpFilesView : UserControl
     public FtpFilesViewModel ViewModel =>
         DataContext as FtpFilesViewModel ?? throw new InvalidOperationException();
 
-    private void BorderFileOnDoubleTapped(object? sender, TappedEventArgs e)
+    private void FileBorderOnDoubleTapped(object? sender, TappedEventArgs e)
     {
         if (sender is not IDataContextProvider dataContextProvider)
         {

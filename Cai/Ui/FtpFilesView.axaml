@@ -32,7 +32,8 @@
             <ListBox ItemsSource="{Binding Files}" SelectionMode="Multiple" SelectedItems="{Binding SelectedFiles}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border x:Name="BorderFile" Classes="align-stretch" Background="Transparent" DoubleTapped="BorderFileOnDoubleTapped">
+                        <Border x:Name="FileBorder" Classes="align-stretch" Background="Transparent"
+                                DoubleTapped="FileBorderOnDoubleTapped">
                             <Border.ContextFlyout>
                                 <MenuFlyout>
                                     <MenuItem Header="{DynamicResource Lang.CopyFullPath}"

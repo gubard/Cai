@@ -27,7 +27,7 @@
             <ListBox ItemsSource="{Binding Files}" SelectionMode="Multiple" SelectedItems="{Binding SelectedFiles}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border x:Name="BorderFile"
+                        <Border x:Name="FileBorder"
                             Classes="align-stretch" 
                                 Background="Transparent"
                                 DoubleTapped="FileBorderOnDoubleTapped">
