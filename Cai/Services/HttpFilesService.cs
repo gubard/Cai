@@ -8,13 +8,13 @@ namespace Cai.Services;
 
 public class HttpFilesService(
     HttpClient httpClient,
-    JsonSerializerOptions jsonSerializerOptions,
+    JsonSerializerOptions options,
     ITryPolicyService tryPolicyService,
     IFactory<Memory<HttpHeader>> headersFactory
 )
     : HttpService<AyaGetRequest, AyaPostRequest, AyaGetResponse, AyaPostResponse>(
         httpClient,
-        jsonSerializerOptions,
+        options,
         tryPolicyService,
         headersFactory
     ),
