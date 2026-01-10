@@ -37,7 +37,7 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
     public object Header { get; }
     public IEnumerable<RootDirectory> Roots { get; }
 
-    public ConfiguredValueTaskAwaitable InitAsync(CancellationToken ct)
+    public ConfiguredValueTaskAwaitable InitUiAsync(CancellationToken ct)
     {
         return InitCore(ct).ConfigureAwait(false);
     }
