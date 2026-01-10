@@ -32,17 +32,7 @@
             <ListBox ItemsSource="{Binding Files}" SelectionMode="Multiple" SelectedItems="{Binding SelectedFiles}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Classes="align-stretch" Background="Transparent">
-                            <Interaction.Behaviors>
-                                <BehaviorCollection>
-                                    <EventTriggerBehavior EventName="DoubleTapped">
-                                        <InvokeCommandAction
-                                            Command="{Binding $parent[ui:FtpFilesView].ViewModel.OpenFileCommand}"
-                                            CommandParameter="{Binding}" />
-                                    </EventTriggerBehavior>
-                                </BehaviorCollection>
-                            </Interaction.Behaviors>
-
+                        <Border x:Name="BorderFile" Classes="align-stretch" Background="Transparent" DoubleTapped="BorderFileOnDoubleTapped">
                             <Border.ContextFlyout>
                                 <MenuFlyout>
                                     <MenuItem Header="{DynamicResource Lang.CopyFullPath}"

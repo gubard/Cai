@@ -1,4 +1,5 @@
-﻿using Cai.Models;
+﻿using System.Runtime.CompilerServices;
+using Cai.Models;
 using Cai.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -9,17 +10,8 @@ using File = Cai.Models.File;
 
 namespace Cai.Ui;
 
-public partial class FilesPanelViewModel : ViewModelBase, IHeader
+public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
 {
-    private readonly ICaiViewModelFactory _factory;
-    private readonly IUiFilesService _uiFilesService;
-
-    [ObservableProperty]
-    private IFilesView _firstFiles;
-
-    [ObservableProperty]
-    private IFilesView _secondFiles;
-
     public FilesPanelViewModel(
         ICaiViewModelFactory factory,
         IStorageService storageService,
@@ -45,10 +37,23 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader
     public object Header { get; }
     public IEnumerable<RootDirectory> Roots { get; }
 
-    [RelayCommand]
-    private async Task InitializedAsync(CancellationToken ct)
+    public ConfiguredValueTaskAwaitable InitAsync(CancellationToken ct)
     {
-        await WrapCommandAsync(() => _uiFilesService.GetAsync(new() { IsGetFiles = true }, ct), ct);
+        return InitCore(ct).ConfigureAwait(false);
+    }
+
+    private readonly ICaiViewModelFactory _factory;
+    private readonly IUiFilesService _uiFilesService;
+
+    [ObservableProperty]
+    private IFilesView _firstFiles;
+
+    [ObservableProperty]
+    private IFilesView _secondFiles;
+
+    public async ValueTask InitCore(CancellationToken ct)
+    {
+        await _uiFilesService.GetAsync(new() { IsGetFiles = true }, ct);
     }
 
     [RelayCommand]

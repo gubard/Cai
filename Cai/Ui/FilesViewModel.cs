@@ -53,6 +53,22 @@ public partial class FilesViewModel : ViewModelBase, IFilesView
         return SaveFilesCore(files, ct).ConfigureAwait(false);
     }
 
+    public void OpenFile(LocalFile localFile)
+    {
+        WrapCommand(() =>
+        {
+            switch (localFile.Item)
+            {
+                case DirectoryInfo directoryInfo:
+                {
+                    Directory = directoryInfo;
+
+                    break;
+                }
+            }
+        });
+    }
+
     private async ValueTask SaveFilesCore(IEnumerable<FileData> files, CancellationToken ct)
     {
         using var dis = new Finally(Update);
@@ -146,23 +162,6 @@ public partial class FilesViewModel : ViewModelBase, IFilesView
                 ),
             ct
         );
-    }
-
-    [RelayCommand]
-    private void OpenFile(LocalFile localFile)
-    {
-        WrapCommand(() =>
-        {
-            switch (localFile.Item)
-            {
-                case DirectoryInfo directoryInfo:
-                {
-                    Directory = directoryInfo;
-
-                    break;
-                }
-            }
-        });
     }
 
     private void Update()

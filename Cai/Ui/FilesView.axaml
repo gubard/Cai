@@ -27,17 +27,10 @@
             <ListBox ItemsSource="{Binding Files}" SelectionMode="Multiple" SelectedItems="{Binding SelectedFiles}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Classes="align-stretch" Background="Transparent">
-                            <Interaction.Behaviors>
-                                <BehaviorCollection>
-                                    <EventTriggerBehavior EventName="DoubleTapped">
-                                        <InvokeCommandAction
-                                            Command="{Binding $parent[ui:FilesView].ViewModel.OpenFileCommand}"
-                                            CommandParameter="{Binding}" />
-                                    </EventTriggerBehavior>
-                                </BehaviorCollection>
-                            </Interaction.Behaviors>
-
+                        <Border x:Name="BorderFile"
+                            Classes="align-stretch" 
+                                Background="Transparent"
+                                DoubleTapped="FileBorderOnDoubleTapped">
                             <Border.ContextFlyout>
                                 <MenuFlyout>
                                     <MenuItem Header="{DynamicResource Lang.CopyFullPath}"
