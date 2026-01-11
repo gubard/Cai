@@ -45,7 +45,7 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
                     "Lang.CreatingNewItem"
                 );
                 var create = _appResourceService.GetResource<string>("Lang.Create");
-                var header = _stringFormater.Format(creatingNewItem, "FTP");
+                var header = _stringFormater.Format(creatingNewItem, "FTP").ToDialogHeader();
                 var viewModel = _factory.CreateFtpParameters();
 
                 var createFtpButton = new DialogButton(
