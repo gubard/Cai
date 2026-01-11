@@ -1,8 +1,10 @@
 ﻿using System.Runtime.CompilerServices;
+using Aya.Contract.Models;
 using Cai.Models;
 using Cai.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Gaia.Helpers;
 using Gaia.Services;
 using Inanna.Models;
 using Inanna.Services;
@@ -15,13 +17,13 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
     public FilesPanelViewModel(
         ICaiViewModelFactory factory,
         IStorageService storageService,
-        IFilesMemoryCache filesMemoryCache,
+        IFilesUiCache uiCache,
         IUiFilesService uiFilesService
     )
     {
         _factory = factory;
         _uiFilesService = uiFilesService;
-        Roots = filesMemoryCache.Roots;
+        Roots = uiCache.Roots;
 
         _firstFiles = factory.Create(
             (storageService.GetDbDirectory(), CopyFromFirstToSecondCommand)
@@ -35,7 +37,7 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
     }
 
     public object Header { get; }
-    public IEnumerable<RootDirectory> Roots { get; }
+    public IEnumerable<FileNotify> Roots { get; }
 
     public ConfiguredValueTaskAwaitable InitUiAsync(CancellationToken ct)
     {
@@ -57,22 +59,23 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
     }
 
     [RelayCommand]
-    private void OpenFirstRootDirectory(RootDirectory file)
+    private void OpenFirstRootDirectory(FileNotify file)
     {
         WrapCommand(() =>
         {
             FirstFiles.Dispose();
 
-            FirstFiles = file switch
+            FirstFiles = file.Type switch
             {
-                DriveRootDirectory drive => _factory.Create(
-                    (new(drive.Drive.Name), CopyFromFirstToSecondCommand)
+                FileType.Ftp => _factory.Create(
+                    (
+                        new(file.Host, file.Login, file.Password),
+                        file.Path,
+                        CopyFromFirstToSecondCommand
+                    )
                 ),
-                FtpRootDirectory ftp => _factory.Create(
-                    (new(ftp.Host, ftp.Login, ftp.Password), ftp.Path, CopyFromFirstToSecondCommand)
-                ),
-                LocalRootDirectory local => _factory.Create(
-                    (local.Directory, CopyFromFirstToSecondCommand)
+                FileType.Local => _factory.Create(
+                    (file.Path.ToDir(), CopyFromFirstToSecondCommand)
                 ),
                 _ => throw new ArgumentOutOfRangeException(nameof(file)),
             };
@@ -80,22 +83,23 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
     }
 
     [RelayCommand]
-    private void OpenSecondRootDirectory(RootDirectory file)
+    private void OpenSecondRootDirectory(FileNotify file)
     {
         WrapCommand(() =>
         {
             SecondFiles.Dispose();
 
-            SecondFiles = file switch
+            SecondFiles = file.Type switch
             {
-                DriveRootDirectory drive => _factory.Create(
-                    (new(drive.Drive.Name), CopyFromSecondToFirstCommand)
+                FileType.Ftp => _factory.Create(
+                    (
+                        new(file.Host, file.Login, file.Password),
+                        file.Path,
+                        CopyFromFirstToSecondCommand
+                    )
                 ),
-                FtpRootDirectory ftp => _factory.Create(
-                    (new(ftp.Host, ftp.Login, ftp.Password), ftp.Path, CopyFromSecondToFirstCommand)
-                ),
-                LocalRootDirectory local => _factory.Create(
-                    (local.Directory, CopyFromSecondToFirstCommand)
+                FileType.Local => _factory.Create(
+                    (file.Path.ToDir(), CopyFromFirstToSecondCommand)
                 ),
                 _ => throw new ArgumentOutOfRangeException(nameof(file)),
             };
@@ -131,7 +135,7 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
     }
 
     [RelayCommand]
-    private async Task DeleteRootDirectoryAsync(RootDirectory file, CancellationToken ct)
+    private async Task DeleteRootDirectoryAsync(FileNotify file, CancellationToken ct)
     {
         await WrapCommandAsync(
             () => _uiFilesService.PostAsync(Guid.NewGuid(), new() { DeleteIds = [file.Id] }, ct),

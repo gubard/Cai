@@ -10,9 +10,9 @@ public interface IUiFilesService
 
 public class UiFilesService(
     IHttpFilesService httpService,
-    IEfFilesService efService,
+    IDbFilesService dbService,
     AppState appState,
-    IFilesMemoryCache memoryCache,
+    IFilesUiCache uiCache,
     INavigator navigator,
     string serviceName
 )
@@ -22,7 +22,7 @@ public class UiFilesService(
         AyaGetResponse,
         AyaPostResponse,
         IHttpFilesService,
-        IEfFilesService,
-        IFilesMemoryCache
-    >(httpService, efService, appState, memoryCache, navigator, serviceName),
+        IDbFilesService,
+        IFilesUiCache
+    >(httpService, dbService, appState, uiCache, navigator, serviceName),
         IUiFilesService;

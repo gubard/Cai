@@ -11,7 +11,7 @@
     <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,*">
         <ItemsControl Classes="horizontal-wrap" ItemsSource="{Binding Roots}">
             <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="m:RootDirectory">
+                <DataTemplate DataType="m:FileNotify">
                     <Button
                         Command="{Binding $parent[ui:FilesPanelView].ViewModel.OpenFirstRootDirectoryCommand}"
                         CommandParameter="{Binding}">
@@ -33,7 +33,7 @@
 
         <ItemsControl Grid.Column="1" Classes="horizontal-wrap" ItemsSource="{Binding Roots}">
             <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="m:RootDirectory">
+                <DataTemplate DataType="m:FileNotify">
                     <Button
                         Command="{Binding $parent[ui:FilesPanelView].ViewModel.OpenSecondRootDirectoryCommand}"
                         CommandParameter="{Binding}">

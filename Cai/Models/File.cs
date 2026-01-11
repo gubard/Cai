@@ -1,7 +1,62 @@
-﻿using FluentFTP;
+﻿using Avalonia.Media;
+using Aya.Contract.Models;
+using CommunityToolkit.Mvvm.ComponentModel;
+using FluentFTP;
+using Gaia.Services;
 using IconPacks.Avalonia.MaterialDesign;
 
 namespace Cai.Models;
+
+public partial class FileNotify : ObservableObject, IStaticFactory<Guid, FileNotify>
+{
+    public FileNotify(Guid id)
+    {
+        Id = id;
+    }
+
+    public FileNotify(DriveInfo drive)
+    {
+        Path = drive.RootDirectory.FullName;
+        Name = drive.Name;
+        Icon = PackIconMaterialDesignKind.Folder;
+        Id = Guid.NewGuid();
+        IsFrozen = true;
+    }
+
+    public Guid Id { get; }
+
+    [ObservableProperty]
+    public partial string Name { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial FileType Type { get; set; }
+
+    [ObservableProperty]
+    public partial PackIconMaterialDesignKind Icon { get; set; }
+
+    [ObservableProperty]
+    public partial Color Color { get; set; }
+
+    [ObservableProperty]
+    public partial string Path { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string Password { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string Login { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string Host { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool IsFrozen { get; set; }
+
+    public static FileNotify Create(Guid input)
+    {
+        return new(input);
+    }
+}
 
 public abstract class File
 {

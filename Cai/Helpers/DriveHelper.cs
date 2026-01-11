@@ -4,10 +4,10 @@ namespace Cai.Helpers;
 
 public static class DriveHelper
 {
-    public static readonly ReadOnlyMemory<DriveRootDirectory> Roots;
+    public static readonly ReadOnlyMemory<FileNotify> Drives;
 
     static DriveHelper()
     {
-        Roots = DriveInfo.GetDrives().Select(x => new DriveRootDirectory(x)).ToArray();
+        Drives = DriveInfo.GetDrives().Select(x => new FileNotify(x)).ToArray();
     }
 }
