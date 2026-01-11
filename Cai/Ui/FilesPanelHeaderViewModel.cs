@@ -45,7 +45,6 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
                     "Lang.CreatingNewItem"
                 );
                 var create = _appResourceService.GetResource<string>("Lang.Create");
-                var header = _stringFormater.Format(creatingNewItem, "FTP").ToDialogHeader();
                 var viewModel = _factory.CreateFtpParameters();
 
                 var createFtpButton = new DialogButton(
@@ -56,9 +55,17 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
                 );
 
                 var buttons = new[] { createFtpButton, UiHelper.CancelButton };
-                var dialog = new DialogViewModel(header, viewModel, buttons);
 
-                return _dialogService.ShowMessageBoxAsync(dialog, ct);
+                return _dialogService.ShowMessageBoxAsync(
+                    new(
+                        Dispatcher.UIThread.Invoke(() =>
+                            _stringFormater.Format(creatingNewItem, "FTP").ToDialogHeader()
+                        ),
+                        viewModel,
+                        buttons
+                    ),
+                    ct
+                );
             },
             ct
         );
