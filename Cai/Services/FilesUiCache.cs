@@ -48,7 +48,7 @@ public class FilesMemoryCache
         return TaskHelper.ConfiguredCompletedTask;
     }
 
-    public override void Update(AyaGetResponse source)
+    private void Update(AyaGetResponse source)
     {
         Dispatcher.UIThread.InvokeAsync(() =>
             _roots.UpdateOrder(
@@ -67,7 +67,7 @@ public class FilesMemoryCache
         return TaskHelper.ConfiguredCompletedTask;
     }
 
-    public override void Update(AyaPostRequest source)
+    private void Update(AyaPostRequest source)
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
