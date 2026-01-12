@@ -8,7 +8,6 @@ using Gaia.Services;
 using Inanna.Helpers;
 using Inanna.Models;
 using Inanna.Services;
-using Inanna.Ui;
 
 namespace Cai.Ui;
 
