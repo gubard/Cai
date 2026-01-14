@@ -6,7 +6,7 @@ using Gaia.Services;
 
 namespace Cai.Services;
 
-public class HttpFilesService(
+public sealed class HttpFilesService(
     HttpClient httpClient,
     JsonSerializerOptions options,
     ITryPolicyService tryPolicyService,
@@ -18,4 +18,10 @@ public class HttpFilesService(
         tryPolicyService,
         headersFactory
     ),
-        IHttpFilesService;
+        IHttpFilesService
+{
+    protected override AyaGetRequest CreateHealthCheckGetRequest()
+    {
+        return new();
+    }
+}
