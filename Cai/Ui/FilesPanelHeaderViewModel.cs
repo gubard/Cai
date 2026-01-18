@@ -109,7 +109,7 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
             ct
         );
 
-        Dispatcher.UIThread.Post(() => _dialogService.CloseMessageBox());
+        _dialogService.DispatchCloseMessageBox();
 
         return response;
     }
