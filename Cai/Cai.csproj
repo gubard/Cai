@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.3.10" />
+    <PackageReference Include="Avalonia" Version="11.3.11" />
     <PackageReference Include="FluentFTP" Version="53.0.2" />
     <PackageReference Include="Jab" Version="0.12.0" />
   </ItemGroup>
