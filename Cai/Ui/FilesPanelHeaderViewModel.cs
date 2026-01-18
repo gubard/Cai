@@ -1,5 +1,4 @@
-﻿using Avalonia.Threading;
-using Aya.Contract.Models;
+﻿using Aya.Contract.Models;
 using Cai.Services;
 using CommunityToolkit.Mvvm.Input;
 using FluentFTP;
@@ -57,9 +56,7 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
 
                 return _dialogService.ShowMessageBoxAsync(
                     new(
-                        Dispatcher.UIThread.Invoke(() =>
-                            _stringFormater.Format(creatingNewItem, "FTP").ToDialogHeader()
-                        ),
+                        _stringFormater.Format(creatingNewItem, "FTP").DispatchToDialogHeader(),
                         viewModel,
                         buttons
                     ),
