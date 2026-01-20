@@ -106,7 +106,7 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
             ct
         );
 
-        _dialogService.DispatchCloseMessageBox();
+        await _dialogService.CloseMessageBoxAsync(ct);
 
         return response;
     }
