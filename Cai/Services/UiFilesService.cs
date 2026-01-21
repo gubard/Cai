@@ -14,7 +14,8 @@ public class UiFilesService(
     AppState appState,
     IFilesUiCache uiCache,
     INavigator navigator,
-    string serviceName
+    string serviceName,
+    IResponseHandler responseHandler
 )
     : UiService<
         AyaGetRequest,
@@ -24,5 +25,5 @@ public class UiFilesService(
         IHttpFilesService,
         IDbFilesService,
         IFilesUiCache
-    >(httpService, dbService, appState, uiCache, navigator, serviceName),
+    >(httpService, dbService, appState, uiCache, navigator, serviceName, responseHandler),
         IUiFilesService;
