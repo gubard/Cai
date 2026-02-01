@@ -21,27 +21,27 @@ public class CaiViewModelFactory : ICaiViewModelFactory
     private readonly IDialogService _dialogService;
     private readonly IAppResourceService _appResourceService;
     private readonly IStringFormater _stringFormater;
-    private readonly IUiFilesService _uiFilesService;
+    private readonly IFilesUiService _filesUiService;
     private readonly IClipboardService _clipboardService;
 
     public CaiViewModelFactory(
         IDialogService dialogService,
         IAppResourceService appResourceService,
         IStringFormater stringFormater,
-        IUiFilesService uiFilesService,
+        IFilesUiService filesUiService,
         IClipboardService clipboardService
     )
     {
         _dialogService = dialogService;
         _appResourceService = appResourceService;
         _stringFormater = stringFormater;
-        _uiFilesService = uiFilesService;
+        _filesUiService = filesUiService;
         _clipboardService = clipboardService;
     }
 
     public FilesViewModel Create((DirectoryInfo directory, ICommand copyCommand) input)
     {
-        return new(input.directory, input.copyCommand, _uiFilesService, _clipboardService);
+        return new(input.directory, input.copyCommand, _filesUiService, _clipboardService);
     }
 
     FtpParametersViewModel IFactory<FtpParametersViewModel>.Create()
@@ -55,7 +55,7 @@ public class CaiViewModelFactory : ICaiViewModelFactory
             input.ftpClient,
             input.path,
             input.copyCommand,
-            _uiFilesService,
+            _filesUiService,
             _clipboardService
         );
     }
@@ -72,6 +72,6 @@ public class CaiViewModelFactory : ICaiViewModelFactory
 
     public FilesPanelHeaderViewModel CreateFilesPanelHeader()
     {
-        return new(_dialogService, _appResourceService, _stringFormater, this, _uiFilesService);
+        return new(_dialogService, _appResourceService, _stringFormater, this, _filesUiService);
     }
 }

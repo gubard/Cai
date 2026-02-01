@@ -21,7 +21,7 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
         FtpClient ftpClient,
         string path,
         ICommand copyCommand,
-        IUiFilesService uiFilesService,
+        IFilesUiService filesUiService,
         IClipboardService clipboardService
     )
     {
@@ -29,7 +29,7 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
         _selectedFiles = [];
         _ftpClient = ftpClient;
         CopyCommand = copyCommand;
-        _uiFilesService = uiFilesService;
+        _filesUiService = filesUiService;
         _clipboardService = clipboardService;
         ftpClient.Connect();
         var item = ftpClient.GetObjectInfo(path);
@@ -88,7 +88,7 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
     [ObservableProperty]
     private FtpFile _directory;
     private readonly FtpClient _ftpClient;
-    private readonly IUiFilesService _uiFilesService;
+    private readonly IFilesUiService _filesUiService;
     private readonly AvaloniaList<FtpFile> _files;
     private readonly AvaloniaList<FtpFile> _selectedFiles;
     private readonly IClipboardService _clipboardService;
@@ -158,7 +158,7 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
     {
         await WrapCommandAsync(
             () =>
-                _uiFilesService.PostAsync(
+                _filesUiService.PostAsync(
                     Guid.NewGuid(),
                     new()
                     {

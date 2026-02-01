@@ -18,11 +18,11 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
         ICaiViewModelFactory factory,
         IStorageService storageService,
         IFilesUiCache uiCache,
-        IUiFilesService uiFilesService
+        IFilesUiService filesUiService
     )
     {
         _factory = factory;
-        _uiFilesService = uiFilesService;
+        _filesUiService = filesUiService;
         Roots = uiCache.Roots;
 
         _firstFiles = factory.Create(
@@ -45,7 +45,7 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
     }
 
     private readonly ICaiViewModelFactory _factory;
-    private readonly IUiFilesService _uiFilesService;
+    private readonly IFilesUiService _filesUiService;
 
     [ObservableProperty]
     private IFilesView _firstFiles;
@@ -55,7 +55,7 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
 
     public async ValueTask InitCore(CancellationToken ct)
     {
-        await _uiFilesService.GetAsync(new() { IsGetFiles = true }, ct);
+        await _filesUiService.GetAsync(new() { IsGetFiles = true }, ct);
     }
 
     [RelayCommand]
@@ -138,7 +138,7 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
     private async Task DeleteRootDirectoryAsync(FileNotify file, CancellationToken ct)
     {
         await WrapCommandAsync(
-            () => _uiFilesService.PostAsync(Guid.NewGuid(), new() { DeleteIds = [file.Id] }, ct),
+            () => _filesUiService.PostAsync(Guid.NewGuid(), new() { DeleteIds = [file.Id] }, ct),
             ct
         );
     }

@@ -16,21 +16,21 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
     private readonly IAppResourceService _appResourceService;
     private readonly IStringFormater _stringFormater;
     private readonly ICaiViewModelFactory _factory;
-    private readonly IUiFilesService _uiFilesService;
+    private readonly IFilesUiService _filesUiService;
 
     public FilesPanelHeaderViewModel(
         IDialogService dialogService,
         IAppResourceService appResourceService,
         IStringFormater stringFormater,
         ICaiViewModelFactory factory,
-        IUiFilesService uiFilesService
+        IFilesUiService filesUiService
     )
     {
         _dialogService = dialogService;
         _appResourceService = appResourceService;
         _stringFormater = stringFormater;
         _factory = factory;
-        _uiFilesService = uiFilesService;
+        _filesUiService = filesUiService;
     }
 
     [RelayCommand]
@@ -85,7 +85,7 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
             ? client.GetWorkingDirectory()
             : viewModel.Path;
 
-        var response = await _uiFilesService.PostAsync(
+        var response = await _filesUiService.PostAsync(
             Guid.NewGuid(),
             new()
             {
