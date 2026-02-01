@@ -15,23 +15,24 @@ using File = Aya.Contract.Models.File;
 
 namespace Cai.Services;
 
-public interface IFilesUiCache : IUiCache<AyaPostRequest, AyaGetResponse, IFilesMemoryCache>
+public interface IFileSystemUiCache
+    : IUiCache<AyaPostRequest, AyaGetResponse, IFileSystemMemoryCache>
 {
     IEnumerable<FileNotify> Roots { get; }
 }
 
-public interface IFilesMemoryCache : IMemoryCache<AyaPostRequest, AyaGetResponse>
+public interface IFileSystemMemoryCache : IMemoryCache<AyaPostRequest, AyaGetResponse>
 {
     IEnumerable<FileNotify> Roots { get; }
 }
 
-public class FilesMemoryCache
+public class FileSystemMemoryCache
     : MemoryCache<FileNotify, AyaPostRequest, AyaGetResponse>,
-        IFilesMemoryCache
+        IFileSystemMemoryCache
 {
     private readonly AvaloniaList<FileNotify> _roots;
 
-    public FilesMemoryCache()
+    public FileSystemMemoryCache()
     {
         _roots = new(DriveHelper.Drives.ToArray());
     }
@@ -95,11 +96,11 @@ public class FilesMemoryCache
     }
 }
 
-public sealed class FilesUiCache
-    : UiCache<AyaPostRequest, AyaGetResponse, IFilesDbCache, IFilesMemoryCache>,
-        IFilesUiCache
+public sealed class FileSystemSystemUiCache
+    : UiCache<AyaPostRequest, AyaGetResponse, IFileSystemDbCache, IFileSystemMemoryCache>,
+        IFileSystemUiCache
 {
-    public FilesUiCache(IFilesDbCache dbCache, IFilesMemoryCache memoryCache)
+    public FileSystemSystemUiCache(IFileSystemDbCache dbCache, IFileSystemMemoryCache memoryCache)
         : base(dbCache, memoryCache) { }
 
     public IEnumerable<FileNotify> Roots => MemoryCache.Roots;

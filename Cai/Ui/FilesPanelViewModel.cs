@@ -17,7 +17,7 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
     public FilesPanelViewModel(
         ICaiViewModelFactory factory,
         IStorageService storageService,
-        IFilesUiCache uiCache,
+        IFileSystemUiCache uiCache,
         IFilesUiService filesUiService
     )
     {

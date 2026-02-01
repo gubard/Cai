@@ -9,10 +9,10 @@ public interface IFilesUiService
     : IUiService<AyaGetRequest, AyaPostRequest, AyaGetResponse, AyaPostResponse>;
 
 public class FilesUiService(
-    IFilesHttpService filesHttpService,
-    IFilesDbService filesDbService,
+    IFileSystemHttpService fileSystemHttpService,
+    IFileSystemDbService fileSystemDbService,
     AppState appState,
-    IFilesUiCache uiCache,
+    IFileSystemUiCache uiCache,
     INavigator navigator,
     string serviceName,
     IResponseHandler responseHandler
@@ -22,8 +22,16 @@ public class FilesUiService(
         AyaPostRequest,
         AyaGetResponse,
         AyaPostResponse,
-        IFilesHttpService,
-        IFilesDbService,
-        IFilesUiCache
-    >(filesHttpService, filesDbService, appState, uiCache, navigator, serviceName, responseHandler),
+        IFileSystemHttpService,
+        IFileSystemDbService,
+        IFileSystemUiCache
+    >(
+        fileSystemHttpService,
+        fileSystemDbService,
+        appState,
+        uiCache,
+        navigator,
+        serviceName,
+        responseHandler
+    ),
         IFilesUiService;
