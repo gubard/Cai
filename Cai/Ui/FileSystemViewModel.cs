@@ -14,7 +14,7 @@ using Inanna.Services;
 
 namespace Cai.Ui;
 
-public partial class FilesViewModel : ViewModelBase, IFilesView
+public partial class FileSystemViewModel : ViewModelBase, IFilesView
 {
     [ObservableProperty]
     private DirectoryInfo _directory;
@@ -23,7 +23,7 @@ public partial class FilesViewModel : ViewModelBase, IFilesView
     private readonly IFileSystemUiService _fileSystemUiService;
     private readonly IClipboardService _clipboardService;
 
-    public FilesViewModel(
+    public FileSystemViewModel(
         DirectoryInfo directory,
         ICommand copyCommand,
         IFileSystemUiService fileSystemUiService,

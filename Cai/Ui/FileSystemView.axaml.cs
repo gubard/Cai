@@ -5,15 +5,15 @@ using Cai.Models;
 
 namespace Cai.Ui;
 
-public partial class FilesView : UserControl
+public partial class FileSystemView : UserControl
 {
-    public FilesView()
+    public FileSystemView()
     {
         InitializeComponent();
     }
 
-    public FilesViewModel ViewModel =>
-        DataContext as FilesViewModel ?? throw new InvalidOperationException();
+    public FileSystemViewModel ViewModel =>
+        DataContext as FileSystemViewModel ?? throw new InvalidOperationException();
 
     private void FileBorderOnDoubleTapped(object? sender, TappedEventArgs e)
     {

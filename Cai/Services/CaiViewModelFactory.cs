@@ -7,7 +7,7 @@ using Inanna.Services;
 namespace Cai.Services;
 
 public interface ICaiViewModelFactory
-    : IFactory<(DirectoryInfo directory, ICommand copyCommand), FilesViewModel>,
+    : IFactory<(DirectoryInfo directory, ICommand copyCommand), FileSystemViewModel>,
         IFactory<FtpParametersViewModel>,
         IFactory<(FtpClient ftpClient, string path, ICommand copyCommand), FtpFilesViewModel>,
         IFactory<FilesPanelHeaderViewModel>
@@ -39,7 +39,7 @@ public class CaiViewModelFactory : ICaiViewModelFactory
         _clipboardService = clipboardService;
     }
 
-    public FilesViewModel Create((DirectoryInfo directory, ICommand copyCommand) input)
+    public FileSystemViewModel Create((DirectoryInfo directory, ICommand copyCommand) input)
     {
         return new(input.directory, input.copyCommand, _fileSystemUiService, _clipboardService);
     }
