@@ -5,10 +5,10 @@ using Inanna.Services;
 
 namespace Cai.Services;
 
-public interface IFilesUiService
+public interface IFileSystemUiService
     : IUiService<AyaGetRequest, AyaPostRequest, AyaGetResponse, AyaPostResponse>;
 
-public class FilesUiService(
+public class FileSystemUiService(
     IFileSystemHttpService fileSystemHttpService,
     IFileSystemDbService fileSystemDbService,
     AppState appState,
@@ -34,4 +34,4 @@ public class FilesUiService(
         serviceName,
         responseHandler
     ),
-        IFilesUiService;
+        IFileSystemUiService;

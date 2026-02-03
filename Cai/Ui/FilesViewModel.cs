@@ -20,19 +20,19 @@ public partial class FilesViewModel : ViewModelBase, IFilesView
     private DirectoryInfo _directory;
     private readonly AvaloniaList<LocalFile> _files;
     private readonly AvaloniaList<LocalFile> _selectedFiles;
-    private readonly IFilesUiService _filesUiService;
+    private readonly IFileSystemUiService _fileSystemUiService;
     private readonly IClipboardService _clipboardService;
 
     public FilesViewModel(
         DirectoryInfo directory,
         ICommand copyCommand,
-        IFilesUiService filesUiService,
+        IFileSystemUiService fileSystemUiService,
         IClipboardService clipboardService
     )
     {
         _directory = directory;
         CopyCommand = copyCommand;
-        _filesUiService = filesUiService;
+        _fileSystemUiService = fileSystemUiService;
         _clipboardService = clipboardService;
         _files = [];
         _selectedFiles = [];
@@ -143,7 +143,7 @@ public partial class FilesViewModel : ViewModelBase, IFilesView
     {
         await WrapCommandAsync(
             () =>
-                _filesUiService.PostAsync(
+                _fileSystemUiService.PostAsync(
                     Guid.NewGuid(),
                     new()
                     {
