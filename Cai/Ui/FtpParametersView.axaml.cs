@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
+using Inanna.Helpers;
 
 namespace Cai.Ui;
 
@@ -17,7 +18,7 @@ public partial class FtpParametersView : UserControl
             return;
         }
 
-        TextBoxHost.Focus();
+        TextBoxHost.FocusCaretIndex();
         e.Handled = true;
     }
 
@@ -28,7 +29,7 @@ public partial class FtpParametersView : UserControl
             return;
         }
 
-        TextBoxLogin.Focus();
+        TextBoxLogin.FocusCaretIndex();
         e.Handled = true;
     }
 
@@ -39,7 +40,7 @@ public partial class FtpParametersView : UserControl
             return;
         }
 
-        TextBoxPassword.Focus();
+        TextBoxPassword.FocusCaretIndex();
         e.Handled = true;
     }
 
@@ -50,7 +51,7 @@ public partial class FtpParametersView : UserControl
             return;
         }
 
-        TextBoxPath.Focus();
+        TextBoxPath.FocusCaretIndex();
         e.Handled = true;
     }
 }
