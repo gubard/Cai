@@ -11,7 +11,6 @@ public interface IFileSystemUiService
 public class FileSystemUiService(
     IFileSystemHttpService fileSystemHttpService,
     IFileSystemDbService fileSystemDbService,
-    AppState appState,
     IFileSystemUiCache uiCache,
     INavigator navigator,
     string serviceName,
@@ -25,13 +24,5 @@ public class FileSystemUiService(
         IFileSystemHttpService,
         IFileSystemDbService,
         IFileSystemUiCache
-    >(
-        fileSystemHttpService,
-        fileSystemDbService,
-        appState,
-        uiCache,
-        navigator,
-        serviceName,
-        responseHandler
-    ),
+    >(fileSystemHttpService, fileSystemDbService, uiCache, navigator, serviceName, responseHandler),
         IFileSystemUiService;
