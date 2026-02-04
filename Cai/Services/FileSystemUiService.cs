@@ -1,6 +1,5 @@
 ﻿using Aya.Contract.Models;
 using Aya.Contract.Services;
-using Inanna.Models;
 using Inanna.Services;
 
 namespace Cai.Services;
