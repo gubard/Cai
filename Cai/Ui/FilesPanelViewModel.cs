@@ -41,7 +41,10 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
 
     public ConfiguredValueTaskAwaitable InitUiAsync(CancellationToken ct)
     {
-        return InitCore(ct).ConfigureAwait(false);
+        return WrapCommandAsync(
+            () => _fileSystemUiService.GetAsync(new() { IsGetFiles = true }, ct),
+            ct
+        );
     }
 
     private readonly ICaiViewModelFactory _factory;
@@ -52,11 +55,6 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
 
     [ObservableProperty]
     private IFilesView _secondFiles;
-
-    public async ValueTask InitCore(CancellationToken ct)
-    {
-        await _fileSystemUiService.GetAsync(new() { IsGetFiles = true }, ct);
-    }
 
     [RelayCommand]
     private void OpenFirstRootDirectory(FileNotify file)
