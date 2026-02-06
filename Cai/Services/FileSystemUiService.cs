@@ -7,7 +7,7 @@ namespace Cai.Services;
 public interface IFileSystemUiService
     : IUiService<AyaGetRequest, AyaPostRequest, AyaGetResponse, AyaPostResponse>;
 
-public class FileSystemUiService(
+public sealed class FileSystemUiService(
     IFileSystemHttpService fileSystemHttpService,
     IFileSystemDbService fileSystemDbService,
     IFileSystemUiCache uiCache,
@@ -24,4 +24,10 @@ public class FileSystemUiService(
         IFileSystemDbService,
         IFileSystemUiCache
     >(fileSystemHttpService, fileSystemDbService, uiCache, navigator, serviceName, responseHandler),
-        IFileSystemUiService;
+        IFileSystemUiService
+{
+    protected override AyaGetRequest CreateGetRequestRefresh()
+    {
+        return new() { IsGetFiles = true };
+    }
+}
