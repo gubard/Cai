@@ -37,7 +37,7 @@
                                 DoubleTapped="FileBorderOnDoubleTapped">
                             <Border.ContextFlyout>
                                 <MenuFlyout>
-                                    <MenuItem Header="{StaticResource Lang.CopyFullPath}"
+                                    <MenuItem Header="{DynamicResource Lang.CopyFullPath}"
                                               CommandParameter="{Binding}"
                                               Command="{Binding $parent[ui:FtpFilesView].ViewModel.CopyFullPathCommand}" />
                                 </MenuFlyout>

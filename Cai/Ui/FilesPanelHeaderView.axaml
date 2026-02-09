@@ -8,7 +8,7 @@
              x:Class="Cai.Ui.FilesPanelHeaderView"
              x:DataType="ui:FilesPanelHeaderViewModel">
     <Grid ColumnDefinitions="*,Auto">
-        <TextBlock Classes="align-left-canter h2" Text="{StaticResource Lang.Files}" />
+        <TextBlock Classes="align-left-canter h2" Text="{DynamicResource Lang.Files}" />
 
         <DropDownButton Grid.Column="1" Content="{ip:MaterialDesign Add}">
             <DropDownButton.Flyout>
