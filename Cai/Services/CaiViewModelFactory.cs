@@ -1,22 +1,26 @@
 ﻿using System.Windows.Input;
+using Cai.Models;
 using Cai.Ui;
-using FluentFTP;
 using Gaia.Services;
 using Inanna.Services;
 
 namespace Cai.Services;
 
 public interface ICaiViewModelFactory
-    : IFactory<(DirectoryInfo directory, ICommand copyCommand), FileSystemViewModel>,
-        IFactory<FtpParametersViewModel>,
-        IFactory<(FtpClient ftpClient, string path, ICommand copyCommand), FtpFilesViewModel>,
-        IFactory<FilesPanelHeaderViewModel>
 {
     FtpParametersViewModel CreateFtpParameters();
     FilesPanelHeaderViewModel CreateFilesPanelHeader();
+    FileSystemViewModel CreateFileSystem(DirectoryInfo directory, ICommand copyCommand);
+
+    FtpFilesViewModel CreateFtpFiles(
+        IFtpClientService ftpClient,
+        FtpFile file,
+        ICommand copyCommand,
+        FtpParameters ftpParameters
+    );
 }
 
-public class CaiViewModelFactory : ICaiViewModelFactory
+public sealed class CaiViewModelFactory : ICaiViewModelFactory
 {
     private readonly IDialogService _dialogService;
     private readonly IAppResourceService _appResourceService;
@@ -39,30 +43,26 @@ public class CaiViewModelFactory : ICaiViewModelFactory
         _clipboardService = clipboardService;
     }
 
-    public FileSystemViewModel Create((DirectoryInfo directory, ICommand copyCommand) input)
-    {
-        return new(input.directory, input.copyCommand, _fileSystemUiService, _clipboardService);
-    }
-
-    FtpParametersViewModel IFactory<FtpParametersViewModel>.Create()
-    {
-        return CreateFtpParameters();
-    }
-
-    public FtpFilesViewModel Create((FtpClient ftpClient, string path, ICommand copyCommand) input)
+    public FtpFilesViewModel CreateFtpFiles(
+        IFtpClientService ftpClient,
+        FtpFile file,
+        ICommand copyCommand,
+        FtpParameters ftpParameters
+    )
     {
         return new(
-            input.ftpClient,
-            input.path,
-            input.copyCommand,
+            ftpClient,
+            file,
+            copyCommand,
             _fileSystemUiService,
-            _clipboardService
+            _clipboardService,
+            ftpParameters
         );
     }
 
-    FilesPanelHeaderViewModel IFactory<FilesPanelHeaderViewModel>.Create()
+    public FileSystemViewModel CreateFileSystem(DirectoryInfo directory, ICommand copyCommand)
     {
-        return CreateFilesPanelHeader();
+        return new(directory, copyCommand, _fileSystemUiService, _clipboardService);
     }
 
     public FtpParametersViewModel CreateFtpParameters()

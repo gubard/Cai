@@ -1,13 +1,15 @@
-﻿using Avalonia.Media;
+﻿using System.Runtime.CompilerServices;
+using Avalonia.Media;
 using Aya.Contract.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
-using FluentFTP;
+using Gaia.Helpers;
+using Gaia.Models;
 using Gaia.Services;
 using IconPacks.Avalonia.MaterialDesign;
 
 namespace Cai.Models;
 
-public partial class FileNotify : ObservableObject, IStaticFactory<Guid, FileNotify>
+public sealed partial class FileNotify : ObservableObject, IStaticFactory<Guid, FileNotify>
 {
     public FileNotify(Guid id)
     {
@@ -69,10 +71,12 @@ public abstract class File
     public string Name { get; }
     public PackIconMaterialDesignKind Icon { get; }
 
-    public abstract IEnumerable<FileData> GetFileData();
+    public abstract ConfiguredValueTaskAwaitable<IEnumerable<FileData>> GetFileDataAsync(
+        CancellationToken ct
+    );
 }
 
-public class LocalFile : File
+public sealed class LocalFile : File
 {
     public LocalFile(string name, PackIconMaterialDesignKind icon, FileSystemInfo item)
         : base(name, icon)
@@ -93,8 +97,12 @@ public class LocalFile : File
 
     public FileSystemInfo Item { get; }
 
-    public override IEnumerable<FileData> GetFileData()
+    public override ConfiguredValueTaskAwaitable<IEnumerable<FileData>> GetFileDataAsync(
+        CancellationToken ct
+    )
     {
+        var result = new List<FileData>();
+
         switch (Item)
         {
             case DirectoryInfo directory:
@@ -106,29 +114,31 @@ public class LocalFile : File
                     var path = file.FullName.Substring(Item.FullName.Length, length);
                     var filePath = Path.Combine(Item.Name, path.TrimStart('\\').TrimStart('/'));
 
-                    yield return new(filePath, file.OpenRead());
+                    result.Add(new(filePath, file.OpenRead()));
                 }
 
                 break;
             case FileInfo file:
-                yield return new(file.Name, file.OpenRead());
+                result.Add(new(file.Name, file.OpenRead()));
 
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(Item));
         }
+
+        return TaskHelper.FromResult(result.AsEnumerable());
     }
 }
 
-public class FtpFile : File
+public sealed class FtpFile : File
 {
-    private readonly FtpClient _ftpClient;
+    private readonly IFtpClientService _ftpClient;
 
     public FtpFile(
         string name,
         PackIconMaterialDesignKind icon,
-        FtpListItem item,
-        FtpClient ftpClient
+        FtpItem item,
+        IFtpClientService ftpClient
     )
         : base(name, icon)
     {
@@ -136,10 +146,10 @@ public class FtpFile : File
         _ftpClient = ftpClient;
     }
 
-    public FtpFile(FtpListItem item, FtpClient ftpClient)
+    public FtpFile(FtpItem item, IFtpClientService ftpClient)
         : base(
-            item.Name,
-            item.Type == FtpObjectType.Directory
+            Path.GetFileName(item.Path),
+            item.Type == FtpItemType.Directory
                 ? PackIconMaterialDesignKind.Folder
                 : PackIconMaterialDesignKind.InsertDriveFile
         )
@@ -148,50 +158,62 @@ public class FtpFile : File
         _ftpClient = ftpClient;
     }
 
-    public FtpListItem Item { get; }
+    public FtpItem Item { get; }
 
-    public override IEnumerable<FileData> GetFileData()
+    public override ConfiguredValueTaskAwaitable<IEnumerable<FileData>> GetFileDataAsync(
+        CancellationToken ct
+    )
     {
+        return GetFileDataCore(ct).ConfigureAwait(false);
+    }
+
+    private async ValueTask<IEnumerable<FileData>> GetFileDataCore(CancellationToken ct)
+    {
+        var result = new List<FileData>();
+
         switch (Item.Type)
         {
-            case FtpObjectType.Directory:
+            case FtpItemType.Directory:
             {
-                var files = _ftpClient.GetListing(
-                    Item.FullName,
-                    FtpListOption.Recursive | FtpListOption.AllFiles
-                );
+                var files = await _ftpClient.GetListItemAsync(Item.Path, ct);
+                var filesArray = files.ToArray();
 
-                foreach (var file in files)
+                foreach (var file in filesArray)
                 {
-                    if (file.Type != FtpObjectType.File)
+                    if (file.Type != FtpItemType.File)
                     {
                         continue;
                     }
 
-                    var length = file.FullName.Length - Item.FullName.Length;
-                    var path = file.FullName.Substring(Item.FullName.Length, length);
+                    var length = file.Path.Length - Item.Path.Length;
+                    var path = file.Path.Substring(Item.Path.Length, length);
                     var stream = new MemoryStream();
-                    _ftpClient.DownloadStream(stream, file.FullName);
+                    await _ftpClient.DownloadItemAsync(file.Path, stream, ct);
                     stream.Position = 0;
-                    var filePath = Path.Combine(Item.Name, path.TrimStart('\\').TrimStart('/'));
 
-                    yield return new(filePath, stream);
+                    var filePath = Path.Combine(
+                        Path.GetFileName(Item.Path),
+                        path.TrimStart('\\').TrimStart('/')
+                    );
+
+                    result.Add(new(filePath, stream));
                 }
 
                 break;
             }
-            case FtpObjectType.File:
+            case FtpItemType.File:
             {
                 var stream = new MemoryStream();
-                _ftpClient.DownloadStream(stream, Item.FullName);
+                await _ftpClient.DownloadItemAsync(Item.Path, stream, ct);
                 stream.Position = 0;
-
-                yield return new(Item.Name, stream);
+                result.Add(new(Item.Path, stream));
 
                 break;
             }
             default:
                 throw new ArgumentOutOfRangeException(nameof(Item));
         }
+
+        return result;
     }
 }

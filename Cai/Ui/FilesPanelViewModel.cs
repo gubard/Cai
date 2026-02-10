@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Gaia.Helpers;
 using Gaia.Services;
+using IconPacks.Avalonia.MaterialDesign;
 using Inanna.Models;
 using Inanna.Services;
 using File = Cai.Models.File;
@@ -25,12 +26,14 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
         _fileSystemUiService = fileSystemUiService;
         Roots = uiCache.Roots;
 
-        _firstFiles = factory.Create(
-            (storageService.GetDbDirectory(), CopyFromFirstToSecondCommand)
+        _firstFiles = factory.CreateFileSystem(
+            storageService.GetDbDirectory(),
+            CopyFromFirstToSecondCommand
         );
 
-        _secondFiles = factory.Create(
-            (storageService.GetDbDirectory(), CopyFromSecondToFirstCommand)
+        _secondFiles = factory.CreateFileSystem(
+            storageService.GetDbDirectory(),
+            CopyFromSecondToFirstCommand
         );
 
         Header = _factory.CreateFilesPanelHeader();
@@ -57,62 +60,117 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
     private IFilesView _secondFiles;
 
     [RelayCommand]
-    private void OpenFirstRootDirectory(FileNotify file)
+    private async Task OpenFirstRootDirectoryAsync(FileNotify file, CancellationToken ct)
     {
-        WrapCommand(() =>
-        {
-            FirstFiles.Dispose();
-
-            FirstFiles = file.Type switch
+        await WrapCommandAsync(
+            async () =>
             {
-                FileType.Ftp => _factory.Create(
-                    (
-                        new(file.Host, file.Login, file.Password),
-                        file.Path,
-                        CopyFromFirstToSecondCommand
-                    )
-                ),
-                FileType.Local => _factory.Create(
-                    (file.Path.ToDir(), CopyFromFirstToSecondCommand)
-                ),
-                _ => throw new ArgumentOutOfRangeException(nameof(file)),
-            };
-        });
+                FirstFiles.Dispose();
+
+                switch (file.Type)
+                {
+                    case FileType.Ftp:
+                        var values = file.Host.Split(':');
+
+                        var client = await FtpClientService.CreateAsync(
+                            values[0],
+                            values.Length == 1 ? 21 : int.Parse(values[1]),
+                            file.Login,
+                            file.Password,
+                            ct
+                        );
+
+                        var item = await client.GetCurrenDirectoryAsync(ct);
+
+                        FirstFiles = _factory.CreateFtpFiles(
+                            client,
+                            new(item, client),
+                            CopyFromFirstToSecondCommand,
+                            new(file.Host, file.Login, file.Password)
+                        );
+
+                        break;
+                    case FileType.Local:
+                        FirstFiles = _factory.CreateFileSystem(
+                            file.Path.ToDir(),
+                            CopyFromFirstToSecondCommand
+                        );
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(file));
+                }
+            },
+            ct
+        );
     }
 
     [RelayCommand]
-    private void OpenSecondRootDirectory(FileNotify file)
+    private async Task OpenSecondRootDirectoryAsync(FileNotify file, CancellationToken ct)
     {
-        WrapCommand(() =>
-        {
-            SecondFiles.Dispose();
-
-            SecondFiles = file.Type switch
+        await WrapCommandAsync(
+            async () =>
             {
-                FileType.Ftp => _factory.Create(
-                    (
-                        new(file.Host, file.Login, file.Password),
-                        file.Path,
-                        CopyFromFirstToSecondCommand
-                    )
-                ),
-                FileType.Local => _factory.Create(
-                    (file.Path.ToDir(), CopyFromFirstToSecondCommand)
-                ),
-                _ => throw new ArgumentOutOfRangeException(nameof(file)),
-            };
-        });
+                SecondFiles.Dispose();
+
+                switch (file.Type)
+                {
+                    case FileType.Ftp:
+                        var values = file.Host.Split(':');
+
+                        var client = await FtpClientService.CreateAsync(
+                            values[0],
+                            values.Length == 1 ? 21 : int.Parse(values[1]),
+                            file.Login,
+                            file.Password,
+                            ct
+                        );
+
+                        var item = await client.GetCurrenDirectoryAsync(ct);
+
+                        SecondFiles = _factory.CreateFtpFiles(
+                            client,
+                            new(item, client),
+                            CopyFromFirstToSecondCommand,
+                            new(file.Host, file.Login, file.Password)
+                        );
+
+                        break;
+                    case FileType.Local:
+                        SecondFiles = _factory.CreateFileSystem(
+                            file.Path.ToDir(),
+                            CopyFromFirstToSecondCommand
+                        );
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(file));
+                }
+            },
+            ct
+        );
     }
 
     [RelayCommand]
     private async Task CopyFromFirstToSecondAsync(IEnumerable<File> files, CancellationToken ct)
     {
         await WrapCommandAsync(
-            () =>
+            async () =>
             {
-                var fileData = files.Where(x => x.Name != "..").SelectMany(x => x.GetFileData());
+                var list = new List<FileData>();
 
-                return SecondFiles.SaveFilesAsync(fileData, ct);
+                foreach (var file in files)
+                {
+                    if (file.Name == "..")
+                    {
+                        continue;
+                    }
+
+                    var items = await file.GetFileDataAsync(ct);
+                    list.AddRange(items);
+                }
+
+                await SecondFiles.SaveFilesAsync(list, ct);
             },
             ct
         );
@@ -122,11 +180,22 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
     private async Task CopyFromSecondToFirstAsync(IEnumerable<File> files, CancellationToken ct)
     {
         await WrapCommandAsync(
-            () =>
+            async () =>
             {
-                var fileData = files.Where(x => x.Name != "..").SelectMany(x => x.GetFileData());
+                var list = new List<FileData>();
 
-                return FirstFiles.SaveFilesAsync(fileData, ct);
+                foreach (var file in files)
+                {
+                    if (file.Name == "..")
+                    {
+                        continue;
+                    }
+
+                    var items = await file.GetFileDataAsync(ct);
+                    list.AddRange(items);
+                }
+
+                await SecondFiles.SaveFilesAsync(list, ct);
             },
             ct
         );

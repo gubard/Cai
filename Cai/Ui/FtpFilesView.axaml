@@ -22,7 +22,7 @@
         <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
             <StackPanel Classes="horizontal align-left-center">
                 <TextBlock Text="ftp:/" />
-                <TextBlock Text="{Binding Directory.Item.FullName}" />
+                <TextBlock Text="{Binding Directory.Item.Path}" />
             </StackPanel>
 
             <Button Grid.Column="1" Command="{Binding SaveDirectoryCommand}" Content="{ip:MaterialDesign Favorite}" />

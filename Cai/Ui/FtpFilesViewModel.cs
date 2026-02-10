@@ -7,22 +7,23 @@ using Cai.Models;
 using Cai.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using FluentFTP;
 using Gaia.Models;
+using Gaia.Services;
 using IconPacks.Avalonia.MaterialDesign;
 using Inanna.Models;
 using Inanna.Services;
 
 namespace Cai.Ui;
 
-public partial class FtpFilesViewModel : ViewModelBase, IFilesView
+public partial class FtpFilesViewModel : ViewModelBase, IFilesView, IInitUi
 {
     public FtpFilesViewModel(
-        FtpClient ftpClient,
-        string path,
+        IFtpClientService ftpClient,
+        FtpFile directory,
         ICommand copyCommand,
         IFileSystemUiService fileSystemUiService,
-        IClipboardService clipboardService
+        IClipboardService clipboardService,
+        FtpParameters ftpParameters
     )
     {
         _files = [];
@@ -31,10 +32,8 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
         CopyCommand = copyCommand;
         _fileSystemUiService = fileSystemUiService;
         _clipboardService = clipboardService;
-        ftpClient.Connect();
-        var item = ftpClient.GetObjectInfo(path);
-        _directory = new(item, ftpClient);
-        Update();
+        _ftpParameters = ftpParameters;
+        _directory = directory;
     }
 
     public IEnumerable<FtpFile> Files => _files;
@@ -54,7 +53,7 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
         return SaveFilesCore(files, ct).ConfigureAwait(false);
     }
 
-    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
 
@@ -62,7 +61,7 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
         {
             case nameof(Directory):
             {
-                Update();
+                await InitUiAsync(CancellationToken.None);
 
                 break;
             }
@@ -75,7 +74,7 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
         {
             switch (file.Item.Type)
             {
-                case FtpObjectType.Directory:
+                case FtpItemType.Directory:
                 {
                     Directory = file;
 
@@ -87,66 +86,65 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
 
     [ObservableProperty]
     private FtpFile _directory;
-    private readonly FtpClient _ftpClient;
+
+    private readonly IFtpClientService _ftpClient;
     private readonly IFileSystemUiService _fileSystemUiService;
     private readonly AvaloniaList<FtpFile> _files;
     private readonly AvaloniaList<FtpFile> _selectedFiles;
     private readonly IClipboardService _clipboardService;
+    private readonly FtpParameters _ftpParameters;
 
     private async ValueTask SaveFilesCore(IEnumerable<FileData> files, CancellationToken ct)
     {
-        using var dis = new Finally(Update);
+        await using var dis = new FinallyAsync(async () => await UpdateAsync(ct));
 
         foreach (var file in files)
         {
             await using var dispose = file;
-            var remotePath = Path.Combine(Directory.Item.FullName, file.Path);
-
-            if (_ftpClient.FileExists(remotePath))
-            {
-                _ftpClient.DeleteFile(remotePath);
-            }
-
-            if (!_ftpClient.DirectoryExists(Path.GetDirectoryName(remotePath)))
-            {
-                _ftpClient.CreateDirectory(Path.GetDirectoryName(remotePath));
-            }
-
-            _ftpClient.UploadStream(file.Stream, remotePath);
+            var remotePath = Path.Combine(Directory.Item.Path, file.Path);
+            await _ftpClient.UploadItemAsync(remotePath, file.Stream, ct);
         }
     }
 
-    private void Update()
+    private async ValueTask UpdateAsync(CancellationToken ct)
     {
         _files.Clear();
 
-        var lastIndex = Directory.Item.FullName.LastIndexOf('\\');
+        var lastIndex = Directory.Item.Path.LastIndexOf('\\');
 
         if (lastIndex == -1)
         {
-            lastIndex = Directory.Item.FullName.LastIndexOf('/');
+            lastIndex = Directory.Item.Path.LastIndexOf('/');
         }
 
         if (lastIndex != -1)
         {
-            var item = _ftpClient.GetObjectInfo(Directory.Item.FullName.Substring(0, lastIndex));
+            var path = Directory.Item.Path.Substring(0, lastIndex);
+            var isExists = await _ftpClient.IsExistsAsync(path, ct);
 
-            if (item is not null)
+            if (isExists)
             {
-                _files.Add(new("..", PackIconMaterialDesignKind.Undo, item, _ftpClient));
+                _files.Add(
+                    new(
+                        "..",
+                        PackIconMaterialDesignKind.Undo,
+                        await _ftpClient.GetItemAsync(path, ct),
+                        _ftpClient
+                    )
+                );
             }
         }
 
-        var items = _ftpClient.GetListing(Directory.Item.FullName, FtpListOption.AllFiles);
+        var items = (await _ftpClient.GetListItemAsync(Directory.Item.Path, ct)).ToArray();
 
         var directories = items
-            .Where(x => x.Type == FtpObjectType.Directory)
-            .OrderBy(x => x.Name)
+            .Where(x => x.Type == FtpItemType.Directory)
+            .OrderBy(x => Path.GetFileName(x.Path))
             .Select(x => new FtpFile(x, _ftpClient));
 
         var files = items
-            .Where(x => x.Type == FtpObjectType.File)
-            .OrderBy(x => x.Name)
+            .Where(x => x.Type == FtpItemType.File)
+            .OrderBy(x => Path.GetFileName(x.Path))
             .Select(x => new FtpFile(x, _ftpClient));
 
         _files.AddRange(directories);
@@ -166,13 +164,13 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
                         [
                             new()
                             {
-                                Name = Directory.Item.Name,
+                                Name = Path.GetFileName(Directory.Item.Path),
                                 Id = Guid.NewGuid(),
-                                Path = Directory.Item.FullName,
+                                Path = Directory.Item.Path,
                                 Type = FileType.Ftp,
-                                Host = _ftpClient.Host,
-                                Login = _ftpClient.Credentials.UserName,
-                                Password = _ftpClient.Credentials.Password,
+                                Host = _ftpParameters.Host,
+                                Login = _ftpParameters.Login,
+                                Password = _ftpParameters.Password,
                             },
                         ],
                     },
@@ -185,41 +183,33 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView
     [RelayCommand]
     private async Task CopyFullPathAsync(FtpFile ftpFile, CancellationToken ct)
     {
-        await WrapCommandAsync(() => _clipboardService.SetTextAsync(ftpFile.Item.FullName, ct), ct);
+        await WrapCommandAsync(() => _clipboardService.SetTextAsync(ftpFile.Item.Path, ct), ct);
     }
 
     [RelayCommand]
-    private void Delete()
+    private async Task DeleteAsync(CancellationToken ct)
     {
-        WrapCommand(() =>
-        {
-            foreach (var selectedFile in SelectedFiles)
+        await WrapCommandAsync(
+            async () =>
             {
-                if (selectedFile.Name == "..")
+                foreach (var selectedFile in SelectedFiles)
                 {
-                    continue;
+                    if (selectedFile.Name == "..")
+                    {
+                        continue;
+                    }
+
+                    await _ftpClient.DeleteItemAsync(selectedFile.Item.Path, ct);
                 }
 
-                switch (selectedFile.Item.Type)
-                {
-                    case FtpObjectType.File:
-                        _ftpClient.DeleteFile(selectedFile.Item.FullName);
-                        break;
-                    case FtpObjectType.Directory:
-                        _ftpClient.DeleteDirectory(
-                            selectedFile.Item.FullName,
-                            FtpListOption.AllFiles
-                                | FtpListOption.ForceList
-                                | FtpListOption.Recursive
-                        );
-                        break;
-                    case FtpObjectType.Link:
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
+                await UpdateAsync(ct);
+            },
+            ct
+        );
+    }
 
-            Update();
-        });
+    public ConfiguredValueTaskAwaitable InitUiAsync(CancellationToken ct)
+    {
+        return WrapCommandAsync(() => UpdateAsync(ct), ct);
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Aya.Contract.Models;
 using Cai.Services;
 using CommunityToolkit.Mvvm.Input;
-using FluentFTP;
 using Gaia.Helpers;
 using Gaia.Services;
 using Inanna.Helpers;
@@ -78,11 +77,18 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
         CancellationToken ct
     )
     {
-        using var client = new FtpClient(viewModel.Host, viewModel.Login, viewModel.Password);
-        client.Connect();
+        var values = viewModel.Host.Split(':');
+
+        await using var client = await FtpClientService.CreateAsync(
+            values[0],
+            values.Length > 1 ? int.Parse(values[1]) : 21,
+            viewModel.Login,
+            viewModel.Password,
+            ct
+        );
 
         var path = viewModel.Path.IsNullOrWhiteSpace()
-            ? client.GetWorkingDirectory()
+            ? (await client.GetCurrenDirectoryAsync(ct)).Path
             : viewModel.Path;
 
         var response = await _fileSystemUiService.PostAsync(
