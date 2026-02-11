@@ -7,6 +7,7 @@ using Cai.Models;
 using Cai.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Gaia.Helpers;
 using Gaia.Models;
 using IconPacks.Avalonia.MaterialDesign;
 using Inanna.Models;
@@ -36,7 +37,6 @@ public partial class FileSystemViewModel : ViewModelBase, IFilesView
         _clipboardService = clipboardService;
         _files = [];
         _selectedFiles = [];
-        Update();
     }
 
     public IEnumerable<LocalFile> Files => _files;
@@ -189,5 +189,12 @@ public partial class FileSystemViewModel : ViewModelBase, IFilesView
             () => _clipboardService.SetTextAsync(localFile.Item.FullName, ct),
             ct
         );
+    }
+
+    public ConfiguredValueTaskAwaitable InitUiAsync(CancellationToken ct)
+    {
+        WrapCommand(Update);
+
+        return TaskHelper.ConfiguredCompletedTask;
     }
 }

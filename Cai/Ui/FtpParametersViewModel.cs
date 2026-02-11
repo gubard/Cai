@@ -3,29 +3,20 @@ using Inanna.Models;
 
 namespace Cai.Ui;
 
-public partial class FtpParametersViewModel : ViewModelBase
+public sealed partial class FtpParametersViewModel : ViewModelBase
 {
     [ObservableProperty]
-    private string _name;
+    private string _name = string.Empty;
 
     [ObservableProperty]
-    private string _host;
+    private string _host = string.Empty;
 
     [ObservableProperty]
-    private string _login;
+    private string _login = string.Empty;
 
     [ObservableProperty]
-    private string _password;
+    private string _password = string.Empty;
 
     [ObservableProperty]
-    private string _path;
-
-    public FtpParametersViewModel()
-    {
-        _name = string.Empty;
-        _host = string.Empty;
-        _login = string.Empty;
-        _password = string.Empty;
-        _path = string.Empty;
-    }
+    private string _path = string.Empty;
 }

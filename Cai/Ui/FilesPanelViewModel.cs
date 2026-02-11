@@ -45,7 +45,13 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
     public ConfiguredValueTaskAwaitable InitUiAsync(CancellationToken ct)
     {
         return WrapCommandAsync(
-            () => _fileSystemUiService.GetAsync(new() { IsGetFiles = true }, ct),
+            async () =>
+            {
+                await FirstFiles.InitUiAsync(ct);
+                await SecondFiles.InitUiAsync(ct);
+
+                return await _fileSystemUiService.GetAsync(new() { IsGetFiles = true }, ct);
+            },
             ct
         );
     }
@@ -66,40 +72,9 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
             async () =>
             {
                 FirstFiles.Dispose();
-
-                switch (file.Type)
-                {
-                    case FileType.Ftp:
-                        var values = file.Host.Split(':');
-
-                        var client = await FtpClientService.CreateAsync(
-                            values[0],
-                            values.Length == 1 ? 21 : int.Parse(values[1]),
-                            file.Login,
-                            file.Password,
-                            ct
-                        );
-
-                        var item = await client.GetCurrenDirectoryAsync(ct);
-
-                        FirstFiles = _factory.CreateFtpFiles(
-                            client,
-                            new(item, client),
-                            CopyFromFirstToSecondCommand,
-                            new(file.Host, file.Login, file.Password)
-                        );
-
-                        break;
-                    case FileType.Local:
-                        FirstFiles = _factory.CreateFileSystem(
-                            file.Path.ToDir(),
-                            CopyFromFirstToSecondCommand
-                        );
-
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(file));
-                }
+                var view = await CreateFilesView(file, ct);
+                await view.InitUiAsync(ct);
+                FirstFiles = view;
             },
             ct
         );
@@ -112,43 +87,42 @@ public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
             async () =>
             {
                 SecondFiles.Dispose();
-
-                switch (file.Type)
-                {
-                    case FileType.Ftp:
-                        var values = file.Host.Split(':');
-
-                        var client = await FtpClientService.CreateAsync(
-                            values[0],
-                            values.Length == 1 ? 21 : int.Parse(values[1]),
-                            file.Login,
-                            file.Password,
-                            ct
-                        );
-
-                        var item = await client.GetCurrenDirectoryAsync(ct);
-
-                        SecondFiles = _factory.CreateFtpFiles(
-                            client,
-                            new(item, client),
-                            CopyFromFirstToSecondCommand,
-                            new(file.Host, file.Login, file.Password)
-                        );
-
-                        break;
-                    case FileType.Local:
-                        SecondFiles = _factory.CreateFileSystem(
-                            file.Path.ToDir(),
-                            CopyFromFirstToSecondCommand
-                        );
-
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(file));
-                }
+                var view = await CreateFilesView(file, ct);
+                await view.InitUiAsync(ct);
+                SecondFiles = view;
             },
             ct
         );
+    }
+
+    private async ValueTask<IFilesView> CreateFilesView(FileNotify file, CancellationToken ct)
+    {
+        switch (file.Type)
+        {
+            case FileType.Ftp:
+                var values = file.Host.Split(':');
+
+                var client = await FtpClientService.CreateAsync(
+                    values[0],
+                    values.Length == 1 ? 21 : int.Parse(values[1]),
+                    file.Login,
+                    file.Password,
+                    ct
+                );
+
+                var item = await client.GetCurrenDirectoryAsync(ct);
+
+                return _factory.CreateFtpFiles(
+                    client,
+                    new(item, client),
+                    CopyFromFirstToSecondCommand,
+                    new(file.Host, file.Login, file.Password)
+                );
+            case FileType.Local:
+                return _factory.CreateFileSystem(file.Path.ToDir(), CopyFromFirstToSecondCommand);
+            default:
+                throw new ArgumentOutOfRangeException(nameof(file));
+        }
     }
 
     [RelayCommand]

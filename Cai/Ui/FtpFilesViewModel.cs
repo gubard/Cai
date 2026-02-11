@@ -15,7 +15,7 @@ using Inanna.Services;
 
 namespace Cai.Ui;
 
-public partial class FtpFilesViewModel : ViewModelBase, IFilesView, IInitUi
+public partial class FtpFilesViewModel : ViewModelBase, IFilesView
 {
     public FtpFilesViewModel(
         IFtpClientService ftpClient,
@@ -61,7 +61,10 @@ public partial class FtpFilesViewModel : ViewModelBase, IFilesView, IInitUi
         {
             case nameof(Directory):
             {
-                await InitUiAsync(CancellationToken.None);
+                await WrapCommandAsync(
+                    () => UpdateAsync(CancellationToken.None),
+                    CancellationToken.None
+                );
 
                 break;
             }

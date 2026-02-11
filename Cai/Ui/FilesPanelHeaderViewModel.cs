@@ -41,6 +41,7 @@ public partial class FilesPanelHeaderViewModel : ViewModelBase
                 var creatingNewItem = _appResourceService.GetResource<string>(
                     "Lang.CreatingNewItem"
                 );
+
                 var create = _appResourceService.GetResource<string>("Lang.Create");
                 var viewModel = _factory.CreateFtpParameters();
 
