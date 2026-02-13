@@ -1,6 +1,6 @@
 ﻿namespace Cai.Models;
 
-public class FileData : IDisposable, IAsyncDisposable
+public sealed class FileData : IDisposable, IAsyncDisposable
 {
     public FileData(string path, Stream stream)
     {

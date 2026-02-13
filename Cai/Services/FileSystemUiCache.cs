@@ -26,7 +26,7 @@ public interface IFileSystemMemoryCache : IMemoryCache<AyaPostRequest, AyaGetRes
     IEnumerable<FileNotify> Roots { get; }
 }
 
-public class FileSystemMemoryCache
+public sealed class FileSystemMemoryCache
     : MemoryCache<FileNotify, AyaPostRequest, AyaGetResponse>,
         IFileSystemMemoryCache
 {

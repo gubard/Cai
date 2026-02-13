@@ -9,7 +9,7 @@ using Inanna.Services;
 
 namespace Cai.Ui;
 
-public partial class FilesPanelHeaderViewModel : ViewModelBase
+public sealed partial class FilesPanelHeaderViewModel : ViewModelBase
 {
     private readonly IDialogService _dialogService;
     private readonly IAppResourceService _appResourceService;

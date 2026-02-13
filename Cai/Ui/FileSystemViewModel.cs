@@ -15,7 +15,7 @@ using Inanna.Services;
 
 namespace Cai.Ui;
 
-public partial class FileSystemViewModel : ViewModelBase, IFilesView
+public sealed partial class FileSystemViewModel : ViewModelBase, IFilesView
 {
     [ObservableProperty]
     private DirectoryInfo _directory;

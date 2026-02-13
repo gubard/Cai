@@ -5,7 +5,7 @@ using Cai.Models;
 
 namespace Cai.Ui;
 
-public partial class FileSystemView : UserControl
+public sealed partial class FileSystemView : UserControl
 {
     public FileSystemView()
     {

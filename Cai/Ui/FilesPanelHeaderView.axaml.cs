@@ -2,7 +2,7 @@
 
 namespace Cai.Ui;
 
-public partial class FilesPanelHeaderView : UserControl
+public sealed partial class FilesPanelHeaderView : UserControl
 {
     public FilesPanelHeaderView()
     {

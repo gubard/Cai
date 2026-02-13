@@ -15,7 +15,7 @@ using Inanna.Services;
 
 namespace Cai.Ui;
 
-public partial class FtpFilesViewModel : ViewModelBase, IFilesView
+public sealed partial class FtpFilesViewModel : ViewModelBase, IFilesView
 {
     public FtpFilesViewModel(
         IFtpClientService ftpClient,

@@ -4,7 +4,7 @@ using Inanna.Helpers;
 
 namespace Cai.Ui;
 
-public partial class FtpParametersView : UserControl
+public sealed partial class FtpParametersView : UserControl
 {
     public FtpParametersView()
     {

@@ -13,7 +13,7 @@ using File = Cai.Models.File;
 
 namespace Cai.Ui;
 
-public partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
+public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
 {
     public FilesPanelViewModel(
         ICaiViewModelFactory factory,

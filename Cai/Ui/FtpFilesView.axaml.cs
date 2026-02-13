@@ -5,7 +5,7 @@ using Cai.Models;
 
 namespace Cai.Ui;
 
-public partial class FtpFilesView : UserControl
+public sealed partial class FtpFilesView : UserControl
 {
     public FtpFilesView()
     {
