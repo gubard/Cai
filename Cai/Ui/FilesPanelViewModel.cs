@@ -6,7 +6,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Gaia.Helpers;
 using Gaia.Services;
-using IconPacks.Avalonia.MaterialDesign;
 using Inanna.Models;
 using Inanna.Services;
 using File = Cai.Models.File;
