@@ -112,7 +112,9 @@ public sealed class LocalFile : File
                 {
                     var length = file.FullName.Length - Item.FullName.Length;
                     var path = file.FullName.Substring(Item.FullName.Length, length);
-                    var filePath = Path.Combine(Item.Name, path.TrimStart('\\').TrimStart('/'));
+
+                    var filePath = Path.Combine(Item.Name, path.TrimStart('\\').TrimStart('/'))
+                        .Replace('\\', '/');
 
                     result.Add(new(filePath, file.OpenRead()));
                 }
@@ -192,9 +194,10 @@ public sealed class FtpFile : File
                     stream.Position = 0;
 
                     var filePath = Path.Combine(
-                        Path.GetFileName(Item.Path),
-                        path.TrimStart('\\').TrimStart('/')
-                    );
+                            Path.GetFileName(Item.Path),
+                            path.TrimStart('\\').TrimStart('/')
+                        )
+                        .Replace('\\', '/');
 
                     result.Add(new(filePath, stream));
                 }

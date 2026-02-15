@@ -104,7 +104,7 @@ public sealed partial class FtpFilesViewModel : ViewModelBase, IFilesView
         foreach (var file in files)
         {
             await using var dispose = file;
-            var remotePath = Path.Combine(Directory.Item.Path, file.Path);
+            var remotePath = Path.Combine(Directory.Item.Path, file.Path).Replace('\\', '/');
             await _ftpClient.UploadItemAsync(remotePath, file.Stream, ct);
         }
     }

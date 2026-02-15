@@ -76,7 +76,10 @@ public sealed partial class FileSystemViewModel : ViewModelBase, IFilesView
         foreach (var file in files)
         {
             await using var dispose = file;
-            var localFile = new FileInfo(Path.Combine(Directory.FullName, file.Path));
+
+            var localFile = new FileInfo(
+                Path.Combine(Directory.FullName, file.Path).Replace('\\', '/')
+            );
 
             if (localFile.Exists)
             {
