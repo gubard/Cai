@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using Aya.Contract.Models;
 using Cai.Models;
 using Cai.Services;
@@ -71,7 +72,7 @@ public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitU
             async () =>
             {
                 FirstFiles.Dispose();
-                var view = await CreateFilesView(file, ct);
+                var view = await CreateFilesView(file, CopyFromFirstToSecondCommand, ct);
                 await view.InitUiAsync(ct);
                 FirstFiles = view;
             },
@@ -86,7 +87,7 @@ public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitU
             async () =>
             {
                 SecondFiles.Dispose();
-                var view = await CreateFilesView(file, ct);
+                var view = await CreateFilesView(file, CopyFromSecondToFirstCommand, ct);
                 await view.InitUiAsync(ct);
                 SecondFiles = view;
             },
@@ -94,7 +95,62 @@ public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitU
         );
     }
 
-    private async ValueTask<IFilesView> CreateFilesView(FileNotify file, CancellationToken ct)
+    [RelayCommand]
+    private async Task CopyFromFirstToSecondAsync(IEnumerable<File> files, CancellationToken ct)
+    {
+        await CopyFromToAsync(FirstFiles, SecondFiles, files, ct);
+    }
+
+    [RelayCommand]
+    private async Task CopyFromSecondToFirstAsync(IEnumerable<File> files, CancellationToken ct)
+    {
+        await CopyFromToAsync(SecondFiles, FirstFiles, files, ct);
+    }
+
+    [RelayCommand]
+    private async Task DeleteRootDirectoryAsync(FileNotify file, CancellationToken ct)
+    {
+        await WrapCommandAsync(
+            () =>
+                _fileSystemUiService.PostAsync(Guid.NewGuid(), new() { DeleteIds = [file.Id] }, ct),
+            ct
+        );
+    }
+
+    private ConfiguredValueTaskAwaitable CopyFromToAsync(
+        IFilesView baseView,
+        IFilesView saveView,
+        IEnumerable<File> files,
+        CancellationToken ct
+    )
+    {
+        return WrapCommandAsync(
+            async () =>
+            {
+                var list = new List<FileData>();
+
+                foreach (var file in files)
+                {
+                    if (file.Name == "..")
+                    {
+                        continue;
+                    }
+
+                    var items = await file.GetFileDataAsync(ct);
+                    list.AddRange(items);
+                }
+
+                await saveView.SaveFilesAsync(list, baseView.BasePath, ct);
+            },
+            ct
+        );
+    }
+
+    private async ValueTask<IFilesView> CreateFilesView(
+        FileNotify file,
+        ICommand copyCommand,
+        CancellationToken ct
+    )
     {
         switch (file.Type)
         {
@@ -114,73 +170,13 @@ public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitU
                 return _factory.CreateFtpFiles(
                     client,
                     new(item, client),
-                    CopyFromFirstToSecondCommand,
+                    copyCommand,
                     new(file.Host, file.Login, file.Password)
                 );
             case FileType.Local:
-                return _factory.CreateFileSystem(file.Path.ToDir(), CopyFromFirstToSecondCommand);
+                return _factory.CreateFileSystem(file.Path.ToDir(), copyCommand);
             default:
                 throw new ArgumentOutOfRangeException(nameof(file));
         }
-    }
-
-    [RelayCommand]
-    private async Task CopyFromFirstToSecondAsync(IEnumerable<File> files, CancellationToken ct)
-    {
-        await WrapCommandAsync(
-            async () =>
-            {
-                var list = new List<FileData>();
-
-                foreach (var file in files)
-                {
-                    if (file.Name == "..")
-                    {
-                        continue;
-                    }
-
-                    var items = await file.GetFileDataAsync(ct);
-                    list.AddRange(items);
-                }
-
-                await SecondFiles.SaveFilesAsync(list, ct);
-            },
-            ct
-        );
-    }
-
-    [RelayCommand]
-    private async Task CopyFromSecondToFirstAsync(IEnumerable<File> files, CancellationToken ct)
-    {
-        await WrapCommandAsync(
-            async () =>
-            {
-                var list = new List<FileData>();
-
-                foreach (var file in files)
-                {
-                    if (file.Name == "..")
-                    {
-                        continue;
-                    }
-
-                    var items = await file.GetFileDataAsync(ct);
-                    list.AddRange(items);
-                }
-
-                await SecondFiles.SaveFilesAsync(list, ct);
-            },
-            ct
-        );
-    }
-
-    [RelayCommand]
-    private async Task DeleteRootDirectoryAsync(FileNotify file, CancellationToken ct)
-    {
-        await WrapCommandAsync(
-            () =>
-                _fileSystemUiService.PostAsync(Guid.NewGuid(), new() { DeleteIds = [file.Id] }, ct),
-            ct
-        );
     }
 }

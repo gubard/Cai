@@ -6,5 +6,11 @@ namespace Cai.Services;
 
 public interface IFilesView : IDisposable, IInitUi
 {
-    ConfiguredValueTaskAwaitable SaveFilesAsync(IEnumerable<FileData> files, CancellationToken ct);
+    string BasePath { get; }
+
+    ConfiguredValueTaskAwaitable SaveFilesAsync(
+        IEnumerable<FileData> files,
+        string basePath,
+        CancellationToken ct
+    );
 }

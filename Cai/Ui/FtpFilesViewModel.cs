@@ -34,11 +34,13 @@ public sealed partial class FtpFilesViewModel : ViewModelBase, IFilesView
         _clipboardService = clipboardService;
         _ftpParameters = ftpParameters;
         _directory = directory;
+        BasePath = directory.Item.Path;
     }
 
     public IEnumerable<FtpFile> Files => _files;
     public ICommand CopyCommand { get; }
     public IAvaloniaReadOnlyList<FtpFile> SelectedFiles => _selectedFiles;
+    public string BasePath { get; }
 
     public void Dispose()
     {
@@ -47,10 +49,11 @@ public sealed partial class FtpFilesViewModel : ViewModelBase, IFilesView
 
     public ConfiguredValueTaskAwaitable SaveFilesAsync(
         IEnumerable<FileData> files,
+        string basePath,
         CancellationToken ct
     )
     {
-        return SaveFilesCore(files, ct).ConfigureAwait(false);
+        return SaveFilesCore(files, basePath, ct).ConfigureAwait(false);
     }
 
     protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
@@ -97,14 +100,19 @@ public sealed partial class FtpFilesViewModel : ViewModelBase, IFilesView
     private readonly IClipboardService _clipboardService;
     private readonly FtpParameters _ftpParameters;
 
-    private async ValueTask SaveFilesCore(IEnumerable<FileData> files, CancellationToken ct)
+    private async ValueTask SaveFilesCore(
+        IEnumerable<FileData> files,
+        string basePath,
+        CancellationToken ct
+    )
     {
         await using var dis = new FinallyAsync(async () => await UpdateAsync(ct));
 
         foreach (var file in files)
         {
             await using var dispose = file;
-            var remotePath = Path.Combine(Directory.Item.Path, file.Path).Replace('\\', '/');
+            var fileSegment = file.Path.Substring(basePath.Length + 1);
+            var remotePath = Path.Combine(Directory.Item.Path, fileSegment).Replace('\\', '/');
             await _ftpClient.UploadItemAsync(remotePath, file.Stream, ct);
         }
     }

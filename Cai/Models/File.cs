@@ -110,18 +110,12 @@ public sealed class LocalFile : File
 
                 foreach (var file in files)
                 {
-                    var length = file.FullName.Length - Item.FullName.Length;
-                    var path = file.FullName.Substring(Item.FullName.Length, length);
-
-                    var filePath = Path.Combine(Item.Name, path.TrimStart('\\').TrimStart('/'))
-                        .Replace('\\', '/');
-
-                    result.Add(new(filePath, file.OpenRead()));
+                    result.Add(new(file.FullName.Replace('\\', '/'), file.OpenRead()));
                 }
 
                 break;
             case FileInfo file:
-                result.Add(new(file.Name, file.OpenRead()));
+                result.Add(new(file.FullName.Replace('\\', '/'), file.OpenRead()));
 
                 break;
             default:

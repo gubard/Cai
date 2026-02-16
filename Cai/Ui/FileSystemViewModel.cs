@@ -37,20 +37,23 @@ public sealed partial class FileSystemViewModel : ViewModelBase, IFilesView
         _clipboardService = clipboardService;
         _files = [];
         _selectedFiles = [];
+        BasePath = directory.FullName;
     }
 
     public IEnumerable<LocalFile> Files => _files;
     public ICommand CopyCommand { get; }
     public IAvaloniaReadOnlyList<LocalFile> SelectedFiles => _selectedFiles;
+    public string BasePath { get; }
 
     public void Dispose() { }
 
     public ConfiguredValueTaskAwaitable SaveFilesAsync(
         IEnumerable<FileData> files,
+        string basePath,
         CancellationToken ct
     )
     {
-        return SaveFilesCore(files, ct).ConfigureAwait(false);
+        return SaveFilesCore(files, basePath, ct).ConfigureAwait(false);
     }
 
     public void OpenFile(LocalFile localFile)
@@ -69,17 +72,20 @@ public sealed partial class FileSystemViewModel : ViewModelBase, IFilesView
         });
     }
 
-    private async ValueTask SaveFilesCore(IEnumerable<FileData> files, CancellationToken ct)
+    private async ValueTask SaveFilesCore(
+        IEnumerable<FileData> files,
+        string basePath,
+        CancellationToken ct
+    )
     {
         using var dis = new Finally(Update);
 
         foreach (var file in files)
         {
             await using var dispose = file;
-
-            var localFile = new FileInfo(
-                Path.Combine(Directory.FullName, file.Path).Replace('\\', '/')
-            );
+            var fileSegment = file.Path.Substring(basePath.Length + 1);
+            var path = Path.Combine(Directory.FullName, fileSegment);
+            var localFile = new FileInfo(path.Replace('\\', '/'));
 
             if (localFile.Exists)
             {
