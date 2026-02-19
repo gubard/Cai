@@ -3,6 +3,7 @@ using Cai.Services;
 using CommunityToolkit.Mvvm.Input;
 using Gaia.Helpers;
 using Gaia.Services;
+using IconPacks.Avalonia.MaterialDesign;
 using Inanna.Helpers;
 using Inanna.Models;
 using Inanna.Services;
@@ -107,6 +108,7 @@ public sealed partial class FilesPanelHeaderViewModel : ViewModelBase
                         Password = viewModel.Password,
                         Id = Guid.NewGuid(),
                         Path = path,
+                        Icon = nameof(PackIconMaterialDesignKind.Cloud),
                     },
                 ],
             },

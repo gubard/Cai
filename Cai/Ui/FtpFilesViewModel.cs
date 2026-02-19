@@ -182,6 +182,7 @@ public sealed partial class FtpFilesViewModel : ViewModelBase, IFilesView
                                 Host = _ftpParameters.Host,
                                 Login = _ftpParameters.Login,
                                 Password = _ftpParameters.Password,
+                                Icon = nameof(PackIconMaterialDesignKind.Cloud),
                             },
                         ],
                     },

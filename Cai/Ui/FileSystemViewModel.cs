@@ -164,6 +164,7 @@ public sealed partial class FileSystemViewModel : ViewModelBase, IFilesView
                                 Id = Guid.NewGuid(),
                                 Path = Directory.FullName,
                                 Type = FileType.Local,
+                                Icon = nameof(PackIconMaterialDesignKind.Folder),
                             },
                         ],
                     },
