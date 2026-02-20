@@ -220,7 +220,7 @@ public sealed partial class FtpFilesViewModel : ViewModelBase, IFilesView
         );
     }
 
-    public ConfiguredValueTaskAwaitable InitUiAsync(CancellationToken ct)
+    public ConfiguredValueTaskAwaitable InitAsync(CancellationToken ct)
     {
         return WrapCommandAsync(() => UpdateAsync(ct), ct);
     }

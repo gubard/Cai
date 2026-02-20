@@ -13,7 +13,7 @@ using File = Cai.Models.File;
 
 namespace Cai.Ui;
 
-public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitUi
+public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInit
 {
     public FilesPanelViewModel(
         ICaiViewModelFactory factory,
@@ -42,13 +42,13 @@ public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitU
     public object Header { get; }
     public IEnumerable<FileNotify> Roots { get; }
 
-    public ConfiguredValueTaskAwaitable InitUiAsync(CancellationToken ct)
+    public ConfiguredValueTaskAwaitable InitAsync(CancellationToken ct)
     {
         return WrapCommandAsync(
             async () =>
             {
-                await FirstFiles.InitUiAsync(ct);
-                await SecondFiles.InitUiAsync(ct);
+                await FirstFiles.InitAsync(ct);
+                await SecondFiles.InitAsync(ct);
 
                 return await _fileSystemUiService.GetAsync(new() { IsGetFiles = true }, ct);
             },
@@ -73,7 +73,7 @@ public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitU
             {
                 FirstFiles.Dispose();
                 var view = await CreateFilesView(file, CopyFromFirstToSecondCommand, ct);
-                await view.InitUiAsync(ct);
+                await view.InitAsync(ct);
                 FirstFiles = view;
             },
             ct
@@ -88,7 +88,7 @@ public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInitU
             {
                 SecondFiles.Dispose();
                 var view = await CreateFilesView(file, CopyFromSecondToFirstCommand, ct);
-                await view.InitUiAsync(ct);
+                await view.InitAsync(ct);
                 SecondFiles = view;
             },
             ct

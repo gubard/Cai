@@ -201,7 +201,7 @@ public sealed partial class FileSystemViewModel : ViewModelBase, IFilesView
         );
     }
 
-    public ConfiguredValueTaskAwaitable InitUiAsync(CancellationToken ct)
+    public ConfiguredValueTaskAwaitable InitAsync(CancellationToken ct)
     {
         WrapCommand(Update);
 

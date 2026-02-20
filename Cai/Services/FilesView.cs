@@ -4,7 +4,7 @@ using Inanna.Services;
 
 namespace Cai.Services;
 
-public interface IFilesView : IDisposable, IInitUi
+public interface IFilesView : IDisposable, IInit
 {
     string BasePath { get; }
 
