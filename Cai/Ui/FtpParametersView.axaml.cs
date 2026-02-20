@@ -9,6 +9,7 @@ public sealed partial class FtpParametersView : UserControl
     public FtpParametersView()
     {
         InitializeComponent();
+        Loaded += (_, _) => TextBoxName.FocusCaretIndex();
     }
 
     private void TextBoxNameOnKeyDown(object? sender, KeyEventArgs e)
