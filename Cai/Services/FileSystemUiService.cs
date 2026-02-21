@@ -12,8 +12,7 @@ public sealed class FileSystemUiService(
     IFileSystemDbService fileSystemDbService,
     IFileSystemUiCache uiCache,
     INavigator navigator,
-    string serviceName,
-    IResponseHandler responseHandler
+    string serviceName
 )
     : UiService<
         AyaGetRequest,
@@ -23,7 +22,7 @@ public sealed class FileSystemUiService(
         IFileSystemHttpService,
         IFileSystemDbService,
         IFileSystemUiCache
-    >(fileSystemHttpService, fileSystemDbService, uiCache, navigator, serviceName, responseHandler),
+    >(fileSystemHttpService, fileSystemDbService, uiCache, navigator, serviceName),
         IFileSystemUiService
 {
     protected override AyaGetRequest CreateGetRequestRefresh()
