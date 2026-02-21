@@ -56,14 +56,13 @@ public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInit
         );
     }
 
-    private readonly ICaiViewModelFactory _factory;
-    private readonly IFileSystemUiService _fileSystemUiService;
-
     [ObservableProperty]
     private IFilesView _firstFiles;
 
     [ObservableProperty]
     private IFilesView _secondFiles;
+    private readonly ICaiViewModelFactory _factory;
+    private readonly IFileSystemUiService _fileSystemUiService;
 
     [RelayCommand]
     private async Task OpenFirstRootDirectoryAsync(FileNotify file, CancellationToken ct)

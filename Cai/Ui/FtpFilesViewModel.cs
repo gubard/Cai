@@ -56,6 +56,27 @@ public sealed partial class FtpFilesViewModel : ViewModelBase, IFilesView
         return SaveFilesCore(files, basePath, ct).ConfigureAwait(false);
     }
 
+    public void OpenFile(FtpFile file)
+    {
+        WrapCommand(() =>
+        {
+            switch (file.Item.Type)
+            {
+                case FtpItemType.Directory:
+                {
+                    Directory = file;
+
+                    break;
+                }
+            }
+        });
+    }
+
+    public ConfiguredValueTaskAwaitable InitAsync(CancellationToken ct)
+    {
+        return WrapCommandAsync(() => UpdateAsync(ct), ct);
+    }
+
     protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
@@ -74,22 +95,6 @@ public sealed partial class FtpFilesViewModel : ViewModelBase, IFilesView
         }
     }
 
-    public void OpenFile(FtpFile file)
-    {
-        WrapCommand(() =>
-        {
-            switch (file.Item.Type)
-            {
-                case FtpItemType.Directory:
-                {
-                    Directory = file;
-
-                    break;
-                }
-            }
-        });
-    }
-
     [ObservableProperty]
     private FtpFile _directory;
 
@@ -99,6 +104,64 @@ public sealed partial class FtpFilesViewModel : ViewModelBase, IFilesView
     private readonly AvaloniaList<FtpFile> _selectedFiles;
     private readonly IClipboardService _clipboardService;
     private readonly FtpParameters _ftpParameters;
+
+    [RelayCommand]
+    private async Task SaveDirectoryAsync(CancellationToken ct)
+    {
+        await WrapCommandAsync(
+            () =>
+                _fileSystemUiService.PostAsync(
+                    Guid.NewGuid(),
+                    new()
+                    {
+                        CreateFiles =
+                        [
+                            new()
+                            {
+                                Name = Path.GetFileName(Directory.Item.Path),
+                                Id = Guid.NewGuid(),
+                                Path = Directory.Item.Path,
+                                Type = FileType.Ftp,
+                                Host = _ftpParameters.Host,
+                                Login = _ftpParameters.Login,
+                                Password = _ftpParameters.Password,
+                                Icon = nameof(PackIconMaterialDesignKind.Cloud),
+                            },
+                        ],
+                    },
+                    ct
+                ),
+            ct
+        );
+    }
+
+    [RelayCommand]
+    private async Task CopyFullPathAsync(FtpFile ftpFile, CancellationToken ct)
+    {
+        await WrapCommandAsync(() => _clipboardService.SetTextAsync(ftpFile.Item.Path, ct), ct);
+    }
+
+    [RelayCommand]
+    private async Task DeleteAsync(CancellationToken ct)
+    {
+        await WrapCommandAsync(
+            async () =>
+            {
+                foreach (var selectedFile in SelectedFiles)
+                {
+                    if (selectedFile.Name == "..")
+                    {
+                        continue;
+                    }
+
+                    await _ftpClient.DeleteItemAsync(selectedFile.Item.Path, ct);
+                }
+
+                await UpdateAsync(ct);
+            },
+            ct
+        );
+    }
 
     private async ValueTask SaveFilesCore(
         IEnumerable<FileData> files,
@@ -160,68 +223,5 @@ public sealed partial class FtpFilesViewModel : ViewModelBase, IFilesView
 
         _files.AddRange(directories);
         _files.AddRange(files);
-    }
-
-    [RelayCommand]
-    private async Task SaveDirectoryAsync(CancellationToken ct)
-    {
-        await WrapCommandAsync(
-            () =>
-                _fileSystemUiService.PostAsync(
-                    Guid.NewGuid(),
-                    new()
-                    {
-                        CreateFiles =
-                        [
-                            new()
-                            {
-                                Name = Path.GetFileName(Directory.Item.Path),
-                                Id = Guid.NewGuid(),
-                                Path = Directory.Item.Path,
-                                Type = FileType.Ftp,
-                                Host = _ftpParameters.Host,
-                                Login = _ftpParameters.Login,
-                                Password = _ftpParameters.Password,
-                                Icon = nameof(PackIconMaterialDesignKind.Cloud),
-                            },
-                        ],
-                    },
-                    ct
-                ),
-            ct
-        );
-    }
-
-    [RelayCommand]
-    private async Task CopyFullPathAsync(FtpFile ftpFile, CancellationToken ct)
-    {
-        await WrapCommandAsync(() => _clipboardService.SetTextAsync(ftpFile.Item.Path, ct), ct);
-    }
-
-    [RelayCommand]
-    private async Task DeleteAsync(CancellationToken ct)
-    {
-        await WrapCommandAsync(
-            async () =>
-            {
-                foreach (var selectedFile in SelectedFiles)
-                {
-                    if (selectedFile.Name == "..")
-                    {
-                        continue;
-                    }
-
-                    await _ftpClient.DeleteItemAsync(selectedFile.Item.Path, ct);
-                }
-
-                await UpdateAsync(ct);
-            },
-            ct
-        );
-    }
-
-    public ConfiguredValueTaskAwaitable InitAsync(CancellationToken ct)
-    {
-        return WrapCommandAsync(() => UpdateAsync(ct), ct);
     }
 }

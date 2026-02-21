@@ -12,12 +12,6 @@ namespace Cai.Ui;
 
 public sealed partial class FilesPanelHeaderViewModel : ViewModelBase
 {
-    private readonly IDialogService _dialogService;
-    private readonly IAppResourceService _appResourceService;
-    private readonly IStringFormater _stringFormater;
-    private readonly ICaiViewModelFactory _factory;
-    private readonly IFileSystemUiService _fileSystemUiService;
-
     public FilesPanelHeaderViewModel(
         IDialogService dialogService,
         IAppResourceService appResourceService,
@@ -32,6 +26,12 @@ public sealed partial class FilesPanelHeaderViewModel : ViewModelBase
         _factory = factory;
         _fileSystemUiService = fileSystemUiService;
     }
+
+    private readonly IDialogService _dialogService;
+    private readonly IAppResourceService _appResourceService;
+    private readonly IStringFormater _stringFormater;
+    private readonly ICaiViewModelFactory _factory;
+    private readonly IFileSystemUiService _fileSystemUiService;
 
     [RelayCommand]
     private async Task ShowCreateFtpAsync(CancellationToken ct)

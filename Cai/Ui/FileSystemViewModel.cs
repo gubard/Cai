@@ -17,13 +17,6 @@ namespace Cai.Ui;
 
 public sealed partial class FileSystemViewModel : ViewModelBase, IFilesView
 {
-    [ObservableProperty]
-    private DirectoryInfo _directory;
-    private readonly AvaloniaList<LocalFile> _files;
-    private readonly AvaloniaList<LocalFile> _selectedFiles;
-    private readonly IFileSystemUiService _fileSystemUiService;
-    private readonly IClipboardService _clipboardService;
-
     public FileSystemViewModel(
         DirectoryInfo directory,
         ICommand copyCommand,
@@ -72,34 +65,11 @@ public sealed partial class FileSystemViewModel : ViewModelBase, IFilesView
         });
     }
 
-    private async ValueTask SaveFilesCore(
-        IEnumerable<FileData> files,
-        string basePath,
-        CancellationToken ct
-    )
+    public ConfiguredValueTaskAwaitable InitAsync(CancellationToken ct)
     {
-        using var dis = new Finally(Update);
+        WrapCommand(Update);
 
-        foreach (var file in files)
-        {
-            await using var dispose = file;
-            var fileSegment = file.Path.Substring(basePath.Length + 1);
-            var path = Path.Combine(Directory.FullName, fileSegment);
-            var localFile = new FileInfo(path.Replace('\\', '/'));
-
-            if (localFile.Exists)
-            {
-                localFile.Delete();
-            }
-
-            if (localFile.Directory is not null && !localFile.Directory.Exists)
-            {
-                localFile.Directory.Create();
-            }
-
-            await using var stream = localFile.Create();
-            await file.Stream.CopyToAsync(stream, ct);
-        }
+        return TaskHelper.ConfiguredCompletedTask;
     }
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
@@ -115,6 +85,14 @@ public sealed partial class FileSystemViewModel : ViewModelBase, IFilesView
             }
         }
     }
+
+    [ObservableProperty]
+    private DirectoryInfo _directory;
+
+    private readonly AvaloniaList<LocalFile> _files;
+    private readonly AvaloniaList<LocalFile> _selectedFiles;
+    private readonly IFileSystemUiService _fileSystemUiService;
+    private readonly IClipboardService _clipboardService;
 
     [RelayCommand]
     private void Delete()
@@ -174,6 +152,45 @@ public sealed partial class FileSystemViewModel : ViewModelBase, IFilesView
         );
     }
 
+    [RelayCommand]
+    private async Task CopyFullPathAsync(LocalFile localFile, CancellationToken ct)
+    {
+        await WrapCommandAsync(
+            () => _clipboardService.SetTextAsync(localFile.Item.FullName, ct),
+            ct
+        );
+    }
+
+    private async ValueTask SaveFilesCore(
+        IEnumerable<FileData> files,
+        string basePath,
+        CancellationToken ct
+    )
+    {
+        using var dis = new Finally(Update);
+
+        foreach (var file in files)
+        {
+            await using var dispose = file;
+            var fileSegment = file.Path.Substring(basePath.Length + 1);
+            var path = Path.Combine(Directory.FullName, fileSegment);
+            var localFile = new FileInfo(path.Replace('\\', '/'));
+
+            if (localFile.Exists)
+            {
+                localFile.Delete();
+            }
+
+            if (localFile.Directory is not null && !localFile.Directory.Exists)
+            {
+                localFile.Directory.Create();
+            }
+
+            await using var stream = localFile.Create();
+            await file.Stream.CopyToAsync(stream, ct);
+        }
+    }
+
     private void Update()
     {
         _files.Clear();
@@ -190,21 +207,5 @@ public sealed partial class FileSystemViewModel : ViewModelBase, IFilesView
 
         _files.AddRange(directories);
         _files.AddRange(Directory.GetFiles().OrderBy(x => x.Name).Select(x => new LocalFile(x)));
-    }
-
-    [RelayCommand]
-    private async Task CopyFullPathAsync(LocalFile localFile, CancellationToken ct)
-    {
-        await WrapCommandAsync(
-            () => _clipboardService.SetTextAsync(localFile.Item.FullName, ct),
-            ct
-        );
-    }
-
-    public ConfiguredValueTaskAwaitable InitAsync(CancellationToken ct)
-    {
-        WrapCommand(Update);
-
-        return TaskHelper.ConfiguredCompletedTask;
     }
 }
