@@ -13,6 +13,21 @@ public static class DriveHelper
     {
         switch (OsHelper.OsType)
         {
+            case Os.Android:
+                var path = Environment.SpecialFolder.Personal.GetPath();
+
+                Drives = new FileNotify[]
+                {
+                    new("83A7B408-3D15-42CF-9BCC-D4E6BFA66D82".ToGuid())
+                    {
+                        Name = Path.GetDirectoryName(path).ThrowIfNull(),
+                        Path = path,
+                        IsFrozen = true,
+                        Icon = PackIconMaterialDesignKind.Folder,
+                    },
+                };
+
+                break;
             case Os.Linux:
                 Drives = new FileNotify[]
                 {
