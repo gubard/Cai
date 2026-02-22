@@ -96,11 +96,11 @@ public sealed class FileSystemMemoryCache
     }
 }
 
-public sealed class FileSystemSystemUiCache
+public sealed class FileSystemUiCache
     : UiCache<AyaPostRequest, AyaGetResponse, IFileSystemDbCache, IFileSystemMemoryCache>,
         IFileSystemUiCache
 {
-    public FileSystemSystemUiCache(IFileSystemDbCache dbCache, IFileSystemMemoryCache memoryCache)
+    public FileSystemUiCache(IFileSystemDbCache dbCache, IFileSystemMemoryCache memoryCache)
         : base(dbCache, memoryCache) { }
 
     public IEnumerable<FileNotify> Roots => MemoryCache.Roots;
