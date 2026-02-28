@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jab" Version="0.12.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\Aya\Aya.Contract\Aya.Contract.csproj" />
     <ProjectReference Include="..\..\Inanna\Inanna\Inanna.csproj" />
   </ItemGroup>
