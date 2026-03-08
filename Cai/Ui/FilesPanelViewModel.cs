@@ -45,13 +45,7 @@ public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInit
     public ConfiguredValueTaskAwaitable InitAsync(CancellationToken ct)
     {
         return WrapCommandAsync(
-            async () =>
-            {
-                await FirstFiles.InitAsync(ct);
-                await SecondFiles.InitAsync(ct);
-
-                return await _fileSystemUiService.GetAsync(new() { IsGetFiles = true }, ct);
-            },
+            () => _fileSystemUiService.GetAsync(new() { IsGetFiles = true }, ct),
             ct
         );
     }
@@ -72,7 +66,6 @@ public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInit
             {
                 FirstFiles.Dispose();
                 var view = await CreateFilesView(file, CopyFromFirstToSecondCommand, ct);
-                await view.InitAsync(ct);
                 FirstFiles = view;
             },
             ct
@@ -87,7 +80,6 @@ public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInit
             {
                 SecondFiles.Dispose();
                 var view = await CreateFilesView(file, CopyFromSecondToFirstCommand, ct);
-                await view.InitAsync(ct);
                 SecondFiles = view;
             },
             ct
