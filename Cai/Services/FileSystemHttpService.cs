@@ -7,13 +7,13 @@ using Gaia.Services;
 namespace Cai.Services;
 
 public sealed class FileSystemHttpService(
-    HttpClient httpClient,
+    IFactory<HttpClient> httpClientFactory,
     JsonSerializerOptions options,
     ITryPolicyService tryPolicyService,
     IFactory<Memory<HttpHeader>> headersFactory
 )
     : HttpService<AyaGetRequest, AyaPostRequest, AyaGetResponse, AyaPostResponse>(
-        httpClient,
+        httpClientFactory,
         options,
         tryPolicyService,
         headersFactory
