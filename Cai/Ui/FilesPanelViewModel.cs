@@ -19,8 +19,10 @@ public sealed partial class FilesPanelViewModel : ViewModelBase, IHeader, IInit
         ICaiViewModelFactory factory,
         IStorageService storageService,
         IFileSystemUiCache uiCache,
-        IFileSystemUiService fileSystemUiService
+        IFileSystemUiService fileSystemUiService,
+        ISafeExecuteWrapper safeExecuteWrapper
     )
+        : base(safeExecuteWrapper)
     {
         _factory = factory;
         _fileSystemUiService = fileSystemUiService;

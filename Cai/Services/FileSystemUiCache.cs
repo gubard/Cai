@@ -12,6 +12,7 @@ using IconPacks.Avalonia.MaterialDesign;
 using Inanna.Helpers;
 using Inanna.Services;
 using File = Aya.Contract.Models.File;
+using IServiceProvider = Gaia.Services.IServiceProvider;
 
 namespace Cai.Services;
 
@@ -32,7 +33,8 @@ public sealed class FileSystemMemoryCache
 {
     private readonly AvaloniaList<FileNotify> _roots;
 
-    public FileSystemMemoryCache()
+    public FileSystemMemoryCache(IServiceProvider serviceProvider)
+        : base(serviceProvider)
     {
         _roots = new(DriveHelper.Drives.ToArray());
     }

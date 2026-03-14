@@ -3,6 +3,7 @@ using Cai.Models;
 using Cai.Ui;
 using Gaia.Services;
 using Inanna.Services;
+using IServiceProvider = Gaia.Services.IServiceProvider;
 
 namespace Cai.Services;
 
@@ -11,6 +12,7 @@ public interface ICaiViewModelFactory
     FtpParametersViewModel CreateFtpParameters();
     FilesPanelHeaderViewModel CreateFilesPanelHeader();
     FileSystemViewModel CreateFileSystem(DirectoryInfo directory, ICommand copyCommand);
+    FilesPanelViewModel CreateFilesPanel();
 
     FtpFilesViewModel CreateFtpFiles(
         IFtpClientService ftpClient,
@@ -22,25 +24,20 @@ public interface ICaiViewModelFactory
 
 public sealed class CaiViewModelFactory : ICaiViewModelFactory
 {
-    private readonly IDialogService _dialogService;
-    private readonly IAppResourceService _appResourceService;
-    private readonly IStringFormater _stringFormater;
-    private readonly IFileSystemUiService _fileSystemUiService;
-    private readonly IClipboardService _clipboardService;
-
-    public CaiViewModelFactory(
-        IDialogService dialogService,
-        IAppResourceService appResourceService,
-        IStringFormater stringFormater,
-        IFileSystemUiService fileSystemUiService,
-        IClipboardService clipboardService
-    )
+    public CaiViewModelFactory(IServiceProvider serviceProvider)
     {
-        _dialogService = dialogService;
-        _appResourceService = appResourceService;
-        _stringFormater = stringFormater;
-        _fileSystemUiService = fileSystemUiService;
-        _clipboardService = clipboardService;
+        _serviceProvider = serviceProvider;
+    }
+
+    public FilesPanelViewModel CreateFilesPanel()
+    {
+        return new(
+            this,
+            _serviceProvider.GetService<IStorageService>(),
+            _serviceProvider.GetService<IFileSystemUiCache>(),
+            _serviceProvider.GetService<IFileSystemUiService>(),
+            _serviceProvider.GetService<ISafeExecuteWrapper>()
+        );
     }
 
     public FtpFilesViewModel CreateFtpFiles(
@@ -54,30 +51,40 @@ public sealed class CaiViewModelFactory : ICaiViewModelFactory
             ftpClient,
             file,
             copyCommand,
-            _fileSystemUiService,
-            _clipboardService,
-            ftpParameters
+            _serviceProvider.GetService<IFileSystemUiService>(),
+            _serviceProvider.GetService<IClipboardService>(),
+            ftpParameters,
+            _serviceProvider.GetService<ISafeExecuteWrapper>()
         );
     }
 
     public FileSystemViewModel CreateFileSystem(DirectoryInfo directory, ICommand copyCommand)
     {
-        return new(directory, copyCommand, _fileSystemUiService, _clipboardService);
+        return new(
+            directory,
+            copyCommand,
+            _serviceProvider.GetService<IFileSystemUiService>(),
+            _serviceProvider.GetService<IClipboardService>(),
+            _serviceProvider.GetService<ISafeExecuteWrapper>()
+        );
     }
 
     public FtpParametersViewModel CreateFtpParameters()
     {
-        return new();
+        return new(_serviceProvider.GetService<ISafeExecuteWrapper>());
     }
 
     public FilesPanelHeaderViewModel CreateFilesPanelHeader()
     {
         return new(
-            _dialogService,
-            _appResourceService,
-            _stringFormater,
+            _serviceProvider.GetService<IDialogService>(),
+            _serviceProvider.GetService<IAppResourceService>(),
+            _serviceProvider.GetService<IStringFormater>(),
             this,
-            _fileSystemUiService
+            _serviceProvider.GetService<IFileSystemUiService>(),
+            _serviceProvider.GetService<ISafeExecuteWrapper>()
         );
     }
+
+    private readonly IServiceProvider _serviceProvider;
 }

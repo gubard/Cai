@@ -6,10 +6,11 @@ using Gaia.Helpers;
 using Gaia.Models;
 using Gaia.Services;
 using IconPacks.Avalonia.MaterialDesign;
+using IServiceProvider = Gaia.Services.IServiceProvider;
 
 namespace Cai.Models;
 
-public sealed partial class FileNotify : ObservableObject, IStaticFactory<Guid, FileNotify>
+public sealed partial class FileNotify : ObservableObject, IStaticServiceFactory<Guid, FileNotify>
 {
     public FileNotify(Guid id)
     {
@@ -54,7 +55,7 @@ public sealed partial class FileNotify : ObservableObject, IStaticFactory<Guid, 
     [ObservableProperty]
     public partial bool IsFrozen { get; set; }
 
-    public static FileNotify Create(Guid input)
+    public static FileNotify Create(Guid input, IServiceProvider serviceProvider)
     {
         return new(input);
     }

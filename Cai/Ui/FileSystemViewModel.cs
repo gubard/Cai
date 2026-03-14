@@ -21,8 +21,10 @@ public sealed partial class FileSystemViewModel : ViewModelBase, IFilesView
         DirectoryInfo directory,
         ICommand copyCommand,
         IFileSystemUiService fileSystemUiService,
-        IClipboardService clipboardService
+        IClipboardService clipboardService,
+        ISafeExecuteWrapper safeExecuteWrapper
     )
+        : base(safeExecuteWrapper)
     {
         _directory = directory;
         CopyCommand = copyCommand;

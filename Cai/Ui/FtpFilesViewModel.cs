@@ -23,8 +23,10 @@ public sealed partial class FtpFilesViewModel : ViewModelBase, IFilesView
         ICommand copyCommand,
         IFileSystemUiService fileSystemUiService,
         IClipboardService clipboardService,
-        FtpParameters ftpParameters
+        FtpParameters ftpParameters,
+        ISafeExecuteWrapper safeExecuteWrapper
     )
+        : base(safeExecuteWrapper)
     {
         _files = [];
         _selectedFiles = [];

@@ -17,8 +17,10 @@ public sealed partial class FilesPanelHeaderViewModel : ViewModelBase
         IAppResourceService appResourceService,
         IStringFormater stringFormater,
         ICaiViewModelFactory factory,
-        IFileSystemUiService fileSystemUiService
+        IFileSystemUiService fileSystemUiService,
+        ISafeExecuteWrapper safeExecuteWrapper
     )
+        : base(safeExecuteWrapper)
     {
         _dialogService = dialogService;
         _appResourceService = appResourceService;
@@ -53,12 +55,13 @@ public sealed partial class FilesPanelHeaderViewModel : ViewModelBase
                     DialogButtonType.Primary
                 );
 
-                var buttons = new[] { createFtpButton, UiHelper.CancelButton };
+                var buttons = new[] { createFtpButton, _dialogService.CancelButton };
 
                 return _dialogService.ShowMessageBoxAsync(
                     new(
                         _stringFormater.Format(creatingNewItem, "FTP").DispatchToDialogHeader(),
                         viewModel,
+                        SafeExecuteWrapper,
                         buttons
                     ),
                     ct
