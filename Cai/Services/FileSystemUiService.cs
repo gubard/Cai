@@ -1,5 +1,6 @@
 ﻿using Aya.Contract.Models;
 using Aya.Contract.Services;
+using Gaia.Services;
 using Inanna.Services;
 
 namespace Cai.Services;
@@ -35,8 +36,12 @@ public sealed class FileSystemUiService(
     ),
         IFileSystemUiService
 {
-    protected override AyaGetRequest CreateGetRequestRefresh()
+    protected override async ValueTask<IValidationErrors> RefreshServiceCore(CancellationToken ct)
     {
-        return new() { IsGetFiles = true };
+        var request = new AyaGetRequest { IsGetFiles = true };
+        var response = await DbService.GetAsync(request, ct);
+        await UiCache.UpdateAsync(response, ct);
+
+        return response;
     }
 }
